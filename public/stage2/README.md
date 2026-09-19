@@ -5,13 +5,13 @@ Single HTML file, no backend, no extension. Lives in `public/stage2/` so the Vit
 Game-style flow: **Intro → Level 1 Resume → Level 2 LinkedIn → Level 3 Cross-check → Result** with a progress bar in the header. "Play demo: honest / fraud" on the intro loads a fixture candidate and walks the same levels.
 
 ## What it does
-1. **Provenance** — records typing rhythm and paste events in the resume box (timing only, never key identity). Paragraphs are colored green = typed, gold = mixed, red = pasted. Signals: `paste_ratio`, `largest_paste_ratio`, `rhythm_cv`, `backspace_ratio`, `think_pauses`.
-2. **LinkedIn PDF** — the candidate uploads the PDF LinkedIn generates from their own profile (Profile → More → Save to PDF; the steps are written on the page). pdf.js reads it in the browser, the Experience section is extracted and shown for review. Fallback: paste the Experience text. No scraping, nothing uploaded anywhere.
-3. **Claim cross-check** — resume + cover letter + the extracted LinkedIn Experience are sent as one set to ChatGPT / Claude / Gemini (bring your own key, kept in `sessionStorage`). Returns positions on each side, inflated titles, date mismatches, contradictions with quotes. **Demo mode** replays a pre-computed result for the two fixture candidates so the stage demo never depends on network.
+1. **Extraction** — resume + optional cover letter + the Experience section from the candidate's own LinkedIn PDF (parsed in-browser with pdf.js; paste fallback) go to ChatGPT / Claude / Gemini (bring your own key, kept in `sessionStorage`). The model returns every position with company, title, dates and employment type, per-company matches, contradictions with quotes, and a first-pass assessment of each company name. **Demo mode** replays a pre-computed extraction for the two fixture candidates.
+2. **Company verification, live from the browser, no key** — every distinct company is looked up in **Wikidata** (is it an organization, founded year, dissolved year, official site, Wikipedia link) and **Clearbit's public company index** (exact-name → domain, then a favicon probe to see the site is reachable). Verdicts: `verified` (public record), `found` (domain only), `unverified` (nothing found), `vague` (Stealth Startup / Confidential / Self-employed), `suspicious` (no record and the name reads as a placeholder, or the dates are impossible for that company). Fixtures fall back to cached lookups if the network is down.
+3. **Titles & dates** — model verdicts plus local logic: a seniority ladder (intern → junior → IC → senior → staff/principal/manager → director → VP → C-level) catches inflated titles even if the model misses them; dates are checked against the company's founded/dissolved years from Wikidata, against each other (end before start, future starts, overlapping full-time roles > 3 months) and against tenure (staff/director titles on too few years).
 4. **Profile plausibility** — local rules on self-reported connections / followers / profile-created year.
-5. **Score** — `0.30·provenance + 0.50·claims + 0.20·profile`, `>= 60` clears Stage 2.
+5. **Score** — `0.50·titles & dates + 0.30·companies + 0.20·profile`, `>= 60` clears Stage 2. Any high-severity finding caps the titles & dates score at 60.
 
-AI-polished wording is never penalized; only paste provenance, factual contradictions and thin/new profiles move the score.
+Polished wording is never penalized; only unverifiable companies, contradicted titles and dates, and thin/new profiles move the score.
 
 ## Output (for Stage 3 / dashboard)
 Written to `localStorage["trustfunnel.stage2.<candidate_id>"]`, `window.TrustFunnelStage2`, and the Copy JSON button.
@@ -20,17 +20,17 @@ Written to `localStorage["trustfunnel.stage2.<candidate_id>"]`, `window.TrustFun
 {
   "candidate_id": "DEMO-0177",
   "status": "flagged",                 // "cleared" | "flagged" | "error"
-  "stage2_consistency_score": 22,
+  "stage2_consistency_score": 4,
   "stage_cleared": false,
   "breakdown": {
-    "provenance": { "score": 31, "weight": 0.3, "signals": { "paste_ratio": 0.98, "largest_paste_ratio": 0.98, "rhythm_cv": null, "backspace_ratio": 0, "think_pauses": 0, "typed_chars": 14, "pasted_chars": 706 } },
-    "claims":     { "score": 18, "weight": 0.5, "positions_matched": 0, "positions_total": 2, "summary": "..." },
+    "claims":    { "score": 0, "weight": 0.5, "positions_matched": 0, "positions_total": 3, "matches": [ ... ], "summary": "..." },
+    "companies": { "score": 0, "weight": 0.3, "checked": [ { "company": "OpenAI", "verdict": "suspicious", "listed_on": ["resume"], "evidence": ["Wikidata Q21708200: ... founded 2015", "Founded 2015, but the resume starts there 2012-02"], "wikidata_id": "Q21708200", "founded": 2015, "domain": "openai.com" } ] },
     "profile":    { "score": 20, "weight": 0.2, "signals": { "connections": 12, "followers": 9, "created_year": 2026, "linkedin_source": "pdf", "pdf_pages": 1, "pdf_producer": "LinkedIn" } }
   },
   "stage2_flags": [ { "code": "TITLE_INFLATED", "severity": "high", "message": "...", "evidence": {} } ],
-  "trace": [ { "signal": "paste_ratio", "value": "98%", "delta": -59 } ],
+  "trace": [ { "signal": "company: OpenAI", "value": "suspicious", "delta": -45 } ],
   "stage3_handoff": {                  // exactly the shape stage3/app/models.py wants
-    "stage_score": { "score": 22, "status": "failed", "flags": ["PASTED_BLOCK", "TITLE_INFLATED"] },
+    "stage_score": { "score": 4, "status": "failed", "flags": ["TITLE_INFLATED", "COMPANY_NOT_YET_FOUNDED"] },
     "candidate_profile": { "candidate_id": "DEMO-0177", "name": "Felix Marlow", "skills": [{ "name": "Kubernetes", "verified": false, "years": 0 }], "experience": [{ "title": "Senior Staff Software Engineer", "company": "Acme Cloud", "summary": "...", "years": 5, "verified": false }], "years_experience": 7, "applications_last_30d": 0, "application_history": [], "burst_ratio": 0 }
   },
   "model": "demo-fixture",
@@ -38,13 +38,12 @@ Written to `localStorage["trustfunnel.stage2.<candidate_id>"]`, `window.TrustFun
 }
 ```
 
-Flag codes: `PASTED_BLOCK`, `UNIFORM_TYPING`, `TITLE_INFLATED`, `DATE_MISMATCH`, `DOC_CONTRADICTION`, `COMPANY_NOT_ON_LINKEDIN`, `THIN_PROFILE`, `NEW_PROFILE`, `LINKEDIN_NOT_PROVIDED`.
+Flag codes: `TITLE_INFLATED`, `DATE_MISMATCH`, `DOC_CONTRADICTION`, `COMPANY_NOT_ON_LINKEDIN`, `COMPANY_NOT_YET_FOUNDED`, `COMPANY_ALREADY_DISSOLVED`, `DATE_IMPOSSIBLE`, `DATE_IN_FUTURE`, `OVERLAPPING_ROLES`, `TITLE_IMPLAUSIBLE_FOR_TENURE`, `COMPANY_LIKELY_FABRICATED`, `COMPANY_UNVERIFIED`, `VAGUE_EMPLOYER`, `THIN_PROFILE`, `NEW_PROFILE`, `LINKEDIN_NOT_PROVIDED`.
 
 ## Demo script (60 s)
-1. **Play demo: honest** → Next → Next → **Run the check** → three tasks tick green → 95, CLEARED, no findings.
-2. **Check another candidate** → **Play demo: fraud** → Level 1 map is all red → Next → Next → **Run** → 22, FLAGGED: 98% pasted in one block, Intern on LinkedIn vs Senior Staff on resume, cover letter says six years vs a three-month internship, 12 connections, profile created this year.
-3. Optional live moment: **Start**, type two lines, then paste a paragraph and watch it turn red. On Level 2 drop a real LinkedIn PDF and open "Review extracted text".
-4. New data (anything that is not one of the two fixtures) needs a model: the page switches to the provider picker and asks for a key. Keys stay in `sessionStorage`.
+1. **Play demo: honest** → Next → Next → **Run the check** → four tasks tick green → 97, CLEARED. Companies table shows Datadog and Squarespace verified live from Wikidata with founded years and domains.
+2. **Check another candidate** → **Play demo: fraud** → Next → Next → **Run** → 4, FLAGGED: Acme Cloud has no public record and reads as a placeholder, "Stealth Startup" is not an employer, and OpenAI was founded in 2015 while the resume claims a 2012 role there; Senior Staff on the resume vs Intern on LinkedIn; cover letter says six years vs a three-month internship; 12 connections; profile created this year.
+3. New data (anything that is not one of the two fixtures) needs a model: the page switches to the provider picker and asks for a key. Company lookups need no key.
 
 ## Fixtures
-`DEMO-0142` Hana Ortiz (honest) and `DEMO-0177` Felix Marlow (fraud) live in the `FIXTURES` object near the bottom of `public/stage2/index.html`; edit there to change names or scores.
+`DEMO-0142` Hana Ortiz (honest: Datadog, Squarespace) and `DEMO-0177` Felix Marlow (fraud: Acme Cloud, Stealth Startup, OpenAI) live in the `FIXTURES` object near the bottom of `public/stage2/index.html`; edit there to change names or scores.
