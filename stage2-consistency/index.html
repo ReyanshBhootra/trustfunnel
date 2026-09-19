@@ -191,7 +191,7 @@
   .bar .n { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); display: flex; justify-content: space-between; }
   .bar .v { font-family: 'Archivo', sans-serif; font-size: 24px; font-weight: 700; margin: 4px 0 8px; }
   .bar .track { height: 6px; background: var(--hairline); border-radius: 3px; overflow: hidden; }
-  .bar .fill { height: 100%; width: 0; background: var(--gold); border-radius: 3px; transition: width 0.7s ease-out; }
+  .bar .fill { height: 100%; width: 100%; transform: scaleX(0); transform-origin: left; background: var(--gold); border-radius: 3px; transition: transform 0.7s ease-out; }
   .bar .fill.low { background: var(--red); }
   .flags { display: flex; flex-direction: column; gap: 8px; }
   .flag { display: grid; grid-template-columns: 8px 1fr; gap: 12px; align-items: start; font-size: 13px; line-height: 1.5; padding: 10px 14px; border: 1px solid var(--hairline); border-radius: 6px; background: var(--panel-2); }
@@ -908,7 +908,7 @@ Working on internal dashboards.`,
     else { let v = 0; const t0 = performance.now(); (function tick(now) { const p = Math.min(1, (now - t0) / 900); v = Math.round(target * (1 - Math.pow(1 - p, 3))); num.textContent = v; if (p < 1) requestAnimationFrame(tick); })(t0); }
     const b = r.breakdown;
     [['prov', b.provenance.score], ['claims', b.claims.score], ['profile', b.profile.score]].forEach(([k, v]) => {
-      $('s-' + k).textContent = v; const f = $('f-' + k); f.className = 'fill' + (v < 60 ? ' low' : ''); requestAnimationFrame(() => f.style.width = v + '%');
+      $('s-' + k).textContent = v; const f = $('f-' + k); f.className = 'fill' + (v < 60 ? ' low' : ''); requestAnimationFrame(() => f.style.transform = 'scaleX(' + (v / 100) + ')');
     });
     const fl = $('flags'); fl.innerHTML = '';
     if (!r.stage2_flags.length) fl.innerHTML = '<div class="flag-empty">No findings. Resume, cover letter and LinkedIn agree.</div>';
