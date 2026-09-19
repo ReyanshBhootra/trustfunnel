@@ -1,0 +1,293 @@
+[
+  {
+    "profile": {
+      "candidate_id": "c_001",
+      "name": "Maya Chen",
+      "years_experience": 8,
+      "applications_last_30d": 6,
+      "burst_ratio": 0.05,
+      "skills": [
+        { "name": "Distributed systems architecture", "verified": true, "years": 6 },
+        { "name": "Go backend service development", "verified": true, "years": 5 },
+        { "name": "PostgreSQL schema design and query tuning", "verified": true, "years": 7 },
+        { "name": "Kubernetes on AWS", "verified": true, "years": 4 },
+        { "name": "Incident response and on-call leadership", "verified": true, "years": 3 }
+      ],
+      "experience": [
+        {
+          "title": "Staff Engineer",
+          "company": "Lumen Data",
+          "summary": "Led the team that rebuilt the event ingestion pipeline to handle 400k messages per second across three regions, and owned the on-call rotation for it.",
+          "years": 4,
+          "verified": true
+        },
+        {
+          "title": "Senior Backend Engineer",
+          "company": "Parcelway",
+          "summary": "Built and operated Go microservices for shipment routing, including the Postgres sharding migration that cut p99 latency by 60%.",
+          "years": 4,
+          "verified": true
+        }
+      ],
+      "application_history": [
+        {
+          "job_title": "Senior Backend Engineer",
+          "applied_at": "2026-09-02",
+          "cover_letter_excerpt": "Your posting mentions rebuilding the ingestion layer, which is almost exactly the project I led at Lumen Data for the last two years."
+        },
+        {
+          "job_title": "Staff Software Engineer, Platform",
+          "applied_at": "2026-09-09",
+          "cover_letter_excerpt": "I spent four years on the platform team at Lumen and I am looking for a role where the infrastructure work is the product, not a side effect."
+        },
+        {
+          "job_title": "Backend Engineer, Infrastructure",
+          "applied_at": "2026-09-15",
+          "cover_letter_excerpt": "I noticed you are running Go services on GCP rather than AWS, and I would want to talk about what drove that choice before anything else."
+        }
+      ]
+    },
+    "identity": { "score": 94, "status": "cleared", "flags": [] },
+    "consistency": { "score": 91, "status": "cleared", "flags": [] }
+  },
+  {
+    "profile": {
+      "candidate_id": "c_002",
+      "name": "Alex Rivera",
+      "years_experience": 7,
+      "applications_last_30d": 41,
+      "burst_ratio": 0.8,
+      "skills": [
+        { "name": "Distributed systems", "verified": false, "years": 6 },
+        { "name": "Python backend development", "verified": false, "years": 7 }
+      ],
+      "experience": [
+        {
+          "title": "Senior Backend Engineer",
+          "company": "Vertex Cloud",
+          "summary": "Built scalable microservices and distributed systems for enterprise clients.",
+          "years": 7,
+          "verified": false
+        }
+      ],
+      "application_history": []
+    },
+    "identity": {
+      "score": 31,
+      "status": "cleared",
+      "flags": [
+        "Live reaction challenge failed: face mesh collapsed on unscripted head turn",
+        "Lip-sync drift exceeded threshold at 3 of 5 audio samples",
+        "Same facial embedding seen on 2 other applications under different names"
+      ]
+    },
+    "consistency": null
+  },
+  {
+    "profile": {
+      "candidate_id": "c_003",
+      "name": "Jordan Blake",
+      "years_experience": 6,
+      "applications_last_30d": 12,
+      "burst_ratio": 0.2,
+      "skills": [
+        { "name": "Python backend development", "verified": true, "years": 5 },
+        { "name": "AWS infrastructure", "verified": false, "years": 4 },
+        { "name": "Distributed systems design", "verified": false, "years": 3 }
+      ],
+      "experience": [
+        {
+          "title": "Backend Engineer",
+          "company": "Tidewater Apps",
+          "summary": "Built Python services for the billing platform and maintained the Postgres data model behind it.",
+          "years": 5,
+          "verified": true
+        },
+        {
+          "title": "Principal Architect",
+          "company": "Grayline Consulting",
+          "summary": "Owned cloud architecture strategy across the enterprise client portfolio.",
+          "years": 1,
+          "verified": false
+        }
+      ],
+      "application_history": [
+        {
+          "job_title": "Backend Engineer",
+          "applied_at": "2026-09-04",
+          "cover_letter_excerpt": "I have spent five years building Python billing services and want to move somewhere the data model matters more."
+        },
+        {
+          "job_title": "Senior Backend Engineer",
+          "applied_at": "2026-09-12",
+          "cover_letter_excerpt": "Billing systems taught me that correctness beats cleverness, and your posting reads like a team that already believes that."
+        }
+      ]
+    },
+    "identity": { "score": 88, "status": "cleared", "flags": [] },
+    "consistency": {
+      "score": 48,
+      "status": "cleared",
+      "flags": [
+        "LinkedIn account created 3 days before application, 11 connections",
+        "Title 'Principal Architect' at Grayline Consulting not publicly verifiable",
+        "Resume submitted as a single paste with uniform keystroke timing"
+      ]
+    }
+  },
+  {
+    "profile": {
+      "candidate_id": "c_004",
+      "name": "Sam Okafor",
+      "years_experience": 5,
+      "applications_last_30d": 214,
+      "burst_ratio": 0.92,
+      "skills": [
+        { "name": "Python backend development", "verified": true, "years": 4 },
+        { "name": "REST API design", "verified": true, "years": 4 },
+        { "name": "Docker and CI pipelines", "verified": false, "years": 3 }
+      ],
+      "experience": [
+        {
+          "title": "Software Engineer",
+          "company": "Brightpath Media",
+          "summary": "Built and maintained Python REST APIs for the content management backend.",
+          "years": 5,
+          "verified": true
+        }
+      ],
+      "application_history": [
+        {
+          "job_title": "Senior Backend Engineer",
+          "applied_at": "2026-09-16",
+          "cover_letter_excerpt": "I am excited to apply for this role. My background in software engineering aligns well with your requirements and I am confident I would be a valuable addition to your team."
+        },
+        {
+          "job_title": "Marketing Operations Manager",
+          "applied_at": "2026-09-16",
+          "cover_letter_excerpt": "I am excited to apply for this role. My background in software engineering aligns well with your requirements and I am confident I would be a valuable addition to your team."
+        },
+        {
+          "job_title": "Registered Nurse, Night Shift",
+          "applied_at": "2026-09-16",
+          "cover_letter_excerpt": "I am excited to apply for this role. My background aligns well with your requirements and I am confident I would be a valuable addition to your team."
+        },
+        {
+          "job_title": "Warehouse Logistics Coordinator",
+          "applied_at": "2026-09-17",
+          "cover_letter_excerpt": "I am excited to apply for this position. My background aligns well with your requirements and I am confident I would be a valuable addition to your team."
+        }
+      ]
+    },
+    "identity": { "score": 82, "status": "cleared", "flags": [] },
+    "consistency": { "score": 74, "status": "cleared", "flags": [] }
+  },
+  {
+    "profile": {
+      "candidate_id": "c_005",
+      "name": "Priya Raman",
+      "years_experience": 7,
+      "applications_last_30d": 4,
+      "burst_ratio": 0.1,
+      "skills": [
+        { "name": "Distributed systems and event-driven architecture", "verified": true, "years": 5 },
+        { "name": "Go and Python service development", "verified": true, "years": 7 },
+        { "name": "Database design and migration strategy", "verified": true, "years": 6 },
+        { "name": "GCP infrastructure and Terraform", "verified": true, "years": 4 },
+        { "name": "Technical design review facilitation", "verified": true, "years": 3 }
+      ],
+      "experience": [
+        {
+          "title": "Senior Software Engineer",
+          "company": "Northwind Logistics",
+          "summary": "Owned the fleet telemetry platform: Go services consuming a Kafka firehose, backed by a partitioned Postgres cluster I designed and migrated live.",
+          "years": 4,
+          "verified": true
+        },
+        {
+          "title": "Backend Engineer",
+          "company": "Halcyon Health",
+          "summary": "Built patient-record APIs under HIPAA constraints and ran the weekly design review for the backend group.",
+          "years": 3,
+          "verified": true
+        }
+      ],
+      "application_history": [
+        {
+          "job_title": "Senior Backend Engineer",
+          "applied_at": "2026-09-08",
+          "cover_letter_excerpt": "The telemetry platform I built at Northwind is the closest thing I have done to what this posting describes, down to the Kafka-to-Postgres shape of it."
+        },
+        {
+          "job_title": "Senior Platform Engineer",
+          "applied_at": "2026-09-14",
+          "cover_letter_excerpt": "I want to keep working on infrastructure that other engineers build on, and your platform team seems to own that end to end."
+        }
+      ]
+    },
+    "identity": { "score": 96, "status": "cleared", "flags": [] },
+    "consistency": { "score": 93, "status": "cleared", "flags": [] }
+  },
+  {
+    "profile": {
+      "candidate_id": "c_006",
+      "name": "Dev Patel",
+      "years_experience": 4,
+      "applications_last_30d": 9,
+      "burst_ratio": 0.15,
+      "skills": [
+        { "name": "Python backend development", "verified": true, "years": 4 },
+        { "name": "PostgreSQL", "verified": true, "years": 3 }
+      ],
+      "experience": [
+        {
+          "title": "Backend Engineer",
+          "company": "Fernwood Retail",
+          "summary": "Built inventory sync services in Python against a Postgres warehouse.",
+          "years": 4,
+          "verified": true
+        }
+      ],
+      "application_history": []
+    },
+    "identity": { "score": 90, "status": "cleared", "flags": [] },
+    "consistency": { "score": 0, "status": "in_progress", "flags": [] }
+  },
+  {
+    "profile": {
+      "candidate_id": "c_007",
+      "name": "Marcus Webb",
+      "years_experience": 6,
+      "applications_last_30d": 18,
+      "burst_ratio": 0.3,
+      "skills": [
+        { "name": "Distributed systems", "verified": true, "years": 5 },
+        { "name": "Python and Go services", "verified": true, "years": 6 },
+        { "name": "AWS and Kubernetes", "verified": true, "years": 4 }
+      ],
+      "experience": [
+        {
+          "title": "Senior Backend Engineer",
+          "company": "Keystone Payments",
+          "summary": "Built high-throughput payment processing services in Go on AWS, including the ledger reconciliation system.",
+          "years": 6,
+          "verified": true
+        }
+      ],
+      "application_history": [
+        {
+          "job_title": "Senior Backend Engineer",
+          "applied_at": "2026-09-05",
+          "cover_letter_excerpt": "Payments work taught me to treat every write as something someone will audit later, which seems relevant to the reliability bar in your posting."
+        },
+        {
+          "job_title": "Backend Engineer, Payments",
+          "applied_at": "2026-09-11",
+          "cover_letter_excerpt": "I have spent six years in payments infrastructure and would rather go deeper there than switch domains."
+        }
+      ]
+    },
+    "identity": { "score": 85, "status": "cleared", "flags": [] },
+    "consistency": { "score": 81, "status": "cleared", "flags": [] }
+  }
+]

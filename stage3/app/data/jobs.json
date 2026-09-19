@@ -1,0 +1,68 @@
+[
+  {
+    "job_id": "j_001",
+    "title": "Senior Backend Engineer (Remote)",
+    "min_years": 5,
+    "rigor": "strict",
+    "requirements": [
+      {
+        "text": "Design and operate distributed systems handling high request volume",
+        "weight": 1.5,
+        "kind": "required"
+      },
+      {
+        "text": "Production experience writing backend services in Python or Go",
+        "weight": 1.5,
+        "kind": "required"
+      },
+      {
+        "text": "Relational database schema design, query optimization, and migrations",
+        "weight": 1.0,
+        "kind": "required"
+      },
+      {
+        "text": "Cloud infrastructure and container orchestration on AWS or GCP",
+        "weight": 1.0,
+        "kind": "required"
+      },
+      {
+        "text": "Owning on-call rotation and production incident response",
+        "weight": 0.8,
+        "kind": "preferred"
+      },
+      {
+        "text": "Experience mentoring engineers and leading technical design reviews",
+        "weight": 0.8,
+        "kind": "preferred"
+      }
+    ]
+  },
+  {
+    "job_id": "j_002",
+    "title": "Customer Support Specialist",
+    "min_years": 1,
+    "rigor": "standard",
+    "requirements": [
+      {
+        "text": "Responding to customer tickets with clear written communication",
+        "weight": 1.5,
+        "kind": "required"
+      },
+      {
+        "text": "De-escalating frustrated customers and handling refund decisions",
+        "weight": 1.0,
+        "kind": "required"
+      },
+      {
+        "text": "Working in a helpdesk platform such as Zendesk or Intercom",
+        "weight": 1.0,
+        "kind": "required"
+      },
+      {
+        "text": "Writing and maintaining internal help center documentation",
+        "weight": 0.8,
+        "kind": "preferred"
+      }
+    ]
+  }
+]

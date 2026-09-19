@@ -1,0 +1,32 @@
+{
+  "c_005": [
+    {
+      "company": "Northwind Logistics",
+      "date": "2025-11-14",
+      "status": "verified",
+      "reason": "Full three-stage clearance, no flags"
+    },
+    {
+      "company": "Cardinal Health Systems",
+      "date": "2026-03-02",
+      "status": "verified",
+      "reason": "Identity and consistency cleared, role withdrawn by employer"
+    }
+  ],
+  "c_007": [
+    {
+      "company": "Meridian Fintech",
+      "date": "2026-01-22",
+      "status": "flagged",
+      "reason": "Same voice print matched two applications under different legal names"
+    }
+  ],
+  "c_002": [
+    {
+      "company": "Atlas Robotics",
+      "date": "2026-02-08",
+      "status": "flagged",
+      "reason": "Live reaction challenge failed; face-swap artifacts on head turn"
+    }
+  ]
+}
