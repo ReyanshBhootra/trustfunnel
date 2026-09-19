@@ -131,6 +131,9 @@ export default function CandidateFlow({ onShowInQueue }) {
         <a className="live-link" href="/stage2/index.html" target="_blank" rel="noreferrer">
           Open live consistency check ↗
         </a>
+        <a className="live-link" href="/stage3/index.html" target="_blank" rel="noreferrer">
+          Open live fit &amp; scoring engine ↗
+        </a>
       </aside>
     </div>
   );

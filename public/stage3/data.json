@@ -1,0 +1,1049 @@
+{
+ "jobs": {
+  "j_001": {
+   "title": "Senior Backend Engineer (Remote)",
+   "rigor": "strict",
+   "min_years": 5.0,
+   "requirements": [
+    {
+     "text": "Design and operate distributed systems handling high request volume",
+     "weight": 1.5,
+     "kind": "required"
+    },
+    {
+     "text": "Production experience writing backend services in Python or Go",
+     "weight": 1.5,
+     "kind": "required"
+    },
+    {
+     "text": "Relational database schema design, query optimization, and migrations",
+     "weight": 1.0,
+     "kind": "required"
+    },
+    {
+     "text": "Cloud infrastructure and container orchestration on AWS or GCP",
+     "weight": 1.0,
+     "kind": "required"
+    },
+    {
+     "text": "Owning on-call rotation and production incident response",
+     "weight": 0.8,
+     "kind": "preferred"
+    },
+    {
+     "text": "Experience mentoring engineers and leading technical design reviews",
+     "weight": 0.8,
+     "kind": "preferred"
+    }
+   ]
+  },
+  "j_002": {
+   "title": "Customer Support Specialist",
+   "rigor": "standard",
+   "min_years": 1.0,
+   "requirements": [
+    {
+     "text": "Responding to customer tickets with clear written communication",
+     "weight": 1.5,
+     "kind": "required"
+    },
+    {
+     "text": "De-escalating frustrated customers and handling refund decisions",
+     "weight": 1.0,
+     "kind": "required"
+    },
+    {
+     "text": "Working in a helpdesk platform such as Zendesk or Intercom",
+     "weight": 1.0,
+     "kind": "required"
+    },
+    {
+     "text": "Writing and maintaining internal help center documentation",
+     "weight": 0.8,
+     "kind": "preferred"
+    }
+   ]
+  }
+ },
+ "candidates": [
+  {
+   "candidate_id": "c_001",
+   "name": "Maya Chen",
+   "applications_last_30d": 6,
+   "results": {
+    "j_001": {
+     "candidate_id": "c_001",
+     "name": "Maya Chen",
+     "job_id": "j_001",
+     "trust_score": 93.9,
+     "sub_scores": {
+      "identity": 94.0,
+      "consistency": 91.0,
+      "fit": 96.8
+     },
+     "weights": {
+      "identity": 0.4,
+      "consistency": 0.3,
+      "fit": 0.3
+     },
+     "stage_status": {
+      "identity": "cleared",
+      "consistency": "cleared",
+      "fit": "cleared"
+     },
+     "gates_cleared": true,
+     "reached_human_review": true,
+     "flagged": false,
+     "flags": [],
+     "fit_detail": {
+      "fit_score": 96.8,
+      "role_fit": 95.8,
+      "seniority_match": 100.0,
+      "requirement_matches": [
+       {
+        "requirement": "Design and operate distributed systems handling high request volume",
+        "kind": "required",
+        "score": 92.8,
+        "best_evidence": "Distributed systems architecture",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Production experience writing backend services in Python or Go",
+        "kind": "required",
+        "score": 100.0,
+        "best_evidence": "Go backend service development",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Relational database schema design, query optimization, and migrations",
+        "kind": "required",
+        "score": 100.0,
+        "best_evidence": "PostgreSQL schema design and query tuning",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Cloud infrastructure and container orchestration on AWS or GCP",
+        "kind": "required",
+        "score": 100.0,
+        "best_evidence": "Kubernetes on AWS",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Owning on-call rotation and production incident response",
+        "kind": "preferred",
+        "score": 100.0,
+        "best_evidence": "Incident response and on-call leadership",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Experience mentoring engineers and leading technical design reviews",
+        "kind": "preferred",
+        "score": 45.7,
+        "best_evidence": "Senior Backend Engineer at Parcelway",
+        "evidence_verified": true
+       }
+      ],
+      "behavioral": {
+       "score": 99.2,
+       "volume": 100.0,
+       "focus": 100.0,
+       "originality": 100.0,
+       "timing": 95.0,
+       "notes": []
+      },
+      "history": {
+       "candidate_id": "c_001",
+       "seen_before": false,
+       "prior_verifications": [],
+       "modifier": 0.0,
+       "flags": []
+      },
+      "flags": []
+     }
+    },
+    "j_002": {
+     "candidate_id": "c_001",
+     "name": "Maya Chen",
+     "job_id": "j_002",
+     "trust_score": 86.9,
+     "sub_scores": {
+      "identity": 94.0,
+      "consistency": 91.0,
+      "fit": 63.7
+     },
+     "weights": {
+      "identity": 0.45,
+      "consistency": 0.35,
+      "fit": 0.2
+     },
+     "stage_status": {
+      "identity": "cleared",
+      "consistency": "cleared",
+      "fit": "cleared"
+     },
+     "gates_cleared": true,
+     "reached_human_review": true,
+     "flagged": false,
+     "flags": [],
+     "fit_detail": {
+      "fit_score": 63.7,
+      "role_fit": 48.4,
+      "seniority_match": 70.0,
+      "requirement_matches": [
+       {
+        "requirement": "Responding to customer tickets with clear written communication",
+        "kind": "required",
+        "score": 53.7,
+        "best_evidence": "Incident response and on-call leadership",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "De-escalating frustrated customers and handling refund decisions",
+        "kind": "required",
+        "score": 23.1,
+        "best_evidence": "Incident response and on-call leadership",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Working in a helpdesk platform such as Zendesk or Intercom",
+        "kind": "required",
+        "score": 47.4,
+        "best_evidence": "Go backend service development",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Writing and maintaining internal help center documentation",
+        "kind": "preferred",
+        "score": 24.7,
+        "best_evidence": "Go backend service development",
+        "evidence_verified": true
+       }
+      ],
+      "behavioral": {
+       "score": 99.2,
+       "volume": 100.0,
+       "focus": 100.0,
+       "originality": 100.0,
+       "timing": 95.0,
+       "notes": []
+      },
+      "history": {
+       "candidate_id": "c_001",
+       "seen_before": false,
+       "prior_verifications": [],
+       "modifier": 0.0,
+       "flags": []
+      },
+      "flags": []
+     }
+    }
+   }
+  },
+  {
+   "candidate_id": "c_002",
+   "name": "Alex Rivera",
+   "applications_last_30d": 41,
+   "results": {
+    "j_001": {
+     "candidate_id": "c_002",
+     "name": "Alex Rivera",
+     "job_id": "j_001",
+     "trust_score": 12.4,
+     "sub_scores": {
+      "identity": 31.0,
+      "consistency": null,
+      "fit": null
+     },
+     "weights": {
+      "identity": 0.4,
+      "consistency": 0.3,
+      "fit": 0.3
+     },
+     "stage_status": {
+      "identity": "failed",
+      "consistency": "not_started",
+      "fit": "not_started"
+     },
+     "gates_cleared": false,
+     "reached_human_review": false,
+     "flagged": true,
+     "flags": [
+      "Live reaction challenge failed: face mesh collapsed on unscripted head turn",
+      "Lip-sync drift exceeded threshold at 3 of 5 audio samples",
+      "Same facial embedding seen on 2 other applications under different names"
+     ],
+     "fit_detail": null
+    },
+    "j_002": {
+     "candidate_id": "c_002",
+     "name": "Alex Rivera",
+     "job_id": "j_002",
+     "trust_score": 14.0,
+     "sub_scores": {
+      "identity": 31.0,
+      "consistency": null,
+      "fit": null
+     },
+     "weights": {
+      "identity": 0.45,
+      "consistency": 0.35,
+      "fit": 0.2
+     },
+     "stage_status": {
+      "identity": "failed",
+      "consistency": "not_started",
+      "fit": "not_started"
+     },
+     "gates_cleared": false,
+     "reached_human_review": false,
+     "flagged": true,
+     "flags": [
+      "Live reaction challenge failed: face mesh collapsed on unscripted head turn",
+      "Lip-sync drift exceeded threshold at 3 of 5 audio samples",
+      "Same facial embedding seen on 2 other applications under different names"
+     ],
+     "fit_detail": null
+    }
+   }
+  },
+  {
+   "candidate_id": "c_003",
+   "name": "Jordan Blake",
+   "applications_last_30d": 12,
+   "results": {
+    "j_001": {
+     "candidate_id": "c_003",
+     "name": "Jordan Blake",
+     "job_id": "j_001",
+     "trust_score": 70.9,
+     "sub_scores": {
+      "identity": 88.0,
+      "consistency": 48.0,
+      "fit": null
+     },
+     "weights": {
+      "identity": 0.4,
+      "consistency": 0.3,
+      "fit": 0.3
+     },
+     "stage_status": {
+      "identity": "cleared",
+      "consistency": "failed",
+      "fit": "not_started"
+     },
+     "gates_cleared": false,
+     "reached_human_review": false,
+     "flagged": false,
+     "flags": [
+      "LinkedIn account created 3 days before application, 11 connections",
+      "Title 'Principal Architect' at Grayline Consulting not publicly verifiable",
+      "Resume submitted as a single paste with uniform keystroke timing"
+     ],
+     "fit_detail": null
+    },
+    "j_002": {
+     "candidate_id": "c_003",
+     "name": "Jordan Blake",
+     "job_id": "j_002",
+     "trust_score": 70.5,
+     "sub_scores": {
+      "identity": 88.0,
+      "consistency": 48.0,
+      "fit": null
+     },
+     "weights": {
+      "identity": 0.45,
+      "consistency": 0.35,
+      "fit": 0.2
+     },
+     "stage_status": {
+      "identity": "cleared",
+      "consistency": "failed",
+      "fit": "not_started"
+     },
+     "gates_cleared": false,
+     "reached_human_review": false,
+     "flagged": false,
+     "flags": [
+      "LinkedIn account created 3 days before application, 11 connections",
+      "Title 'Principal Architect' at Grayline Consulting not publicly verifiable",
+      "Resume submitted as a single paste with uniform keystroke timing"
+     ],
+     "fit_detail": null
+    }
+   }
+  },
+  {
+   "candidate_id": "c_004",
+   "name": "Sam Okafor",
+   "applications_last_30d": 214,
+   "results": {
+    "j_001": {
+     "candidate_id": "c_004",
+     "name": "Sam Okafor",
+     "job_id": "j_001",
+     "trust_score": 68.5,
+     "sub_scores": {
+      "identity": 82.0,
+      "consistency": 74.0,
+      "fit": 45.1
+     },
+     "weights": {
+      "identity": 0.4,
+      "consistency": 0.3,
+      "fit": 0.3
+     },
+     "stage_status": {
+      "identity": "cleared",
+      "consistency": "cleared",
+      "fit": "cleared"
+     },
+     "gates_cleared": true,
+     "reached_human_review": true,
+     "flagged": false,
+     "flags": [
+      "214 applications in 30 days -- consistent with automated mass application",
+      "Applied roles span unrelated functions -- untargeted search",
+      "Cover letters near-identical across applications -- single generated template",
+      "Submission timing is machine-uniform rather than human-irregular"
+     ],
+     "fit_detail": {
+      "fit_score": 45.1,
+      "role_fit": 58.3,
+      "seniority_match": 100.0,
+      "requirement_matches": [
+       {
+        "requirement": "Design and operate distributed systems handling high request volume",
+        "kind": "required",
+        "score": 32.8,
+        "best_evidence": "REST API design",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Production experience writing backend services in Python or Go",
+        "kind": "required",
+        "score": 100.0,
+        "best_evidence": "Python backend development",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Relational database schema design, query optimization, and migrations",
+        "kind": "required",
+        "score": 26.9,
+        "best_evidence": "REST API design",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Cloud infrastructure and container orchestration on AWS or GCP",
+        "kind": "required",
+        "score": 19.4,
+        "best_evidence": "Docker and CI pipelines",
+        "evidence_verified": false
+       },
+       {
+        "requirement": "Owning on-call rotation and production incident response",
+        "kind": "preferred",
+        "score": 0.0,
+        "best_evidence": "REST API design",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Experience mentoring engineers and leading technical design reviews",
+        "kind": "preferred",
+        "score": 29.4,
+        "best_evidence": "Software Engineer at Brightpath Media",
+        "evidence_verified": true
+       }
+      ],
+      "behavioral": {
+       "score": 14.4,
+       "volume": 0.6,
+       "focus": 26.4,
+       "originality": 21.4,
+       "timing": 8.0,
+       "notes": [
+        "214 applications in 30 days -- consistent with automated mass application",
+        "Applied roles span unrelated functions -- untargeted search",
+        "Cover letters near-identical across applications -- single generated template",
+        "Submission timing is machine-uniform rather than human-irregular"
+       ]
+      },
+      "history": {
+       "candidate_id": "c_004",
+       "seen_before": false,
+       "prior_verifications": [],
+       "modifier": 0.0,
+       "flags": []
+      },
+      "flags": [
+       "214 applications in 30 days -- consistent with automated mass application",
+       "Applied roles span unrelated functions -- untargeted search",
+       "Cover letters near-identical across applications -- single generated template",
+       "Submission timing is machine-uniform rather than human-irregular"
+      ]
+     }
+    },
+    "j_002": {
+     "candidate_id": "c_004",
+     "name": "Sam Okafor",
+     "job_id": "j_002",
+     "trust_score": 67.3,
+     "sub_scores": {
+      "identity": 82.0,
+      "consistency": 74.0,
+      "fit": 22.4
+     },
+     "weights": {
+      "identity": 0.45,
+      "consistency": 0.35,
+      "fit": 0.2
+     },
+     "stage_status": {
+      "identity": "cleared",
+      "consistency": "cleared",
+      "fit": "cleared"
+     },
+     "gates_cleared": true,
+     "reached_human_review": true,
+     "flagged": false,
+     "flags": [
+      "214 applications in 30 days -- consistent with automated mass application",
+      "Applied roles span unrelated functions -- untargeted search",
+      "Cover letters near-identical across applications -- single generated template",
+      "Submission timing is machine-uniform rather than human-irregular"
+     ],
+     "fit_detail": {
+      "fit_score": 22.4,
+      "role_fit": 25.8,
+      "seniority_match": 70.0,
+      "requirement_matches": [
+       {
+        "requirement": "Responding to customer tickets with clear written communication",
+        "kind": "required",
+        "score": 0.0,
+        "best_evidence": "REST API design",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "De-escalating frustrated customers and handling refund decisions",
+        "kind": "required",
+        "score": 0.0,
+        "best_evidence": "Python backend development",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Working in a helpdesk platform such as Zendesk or Intercom",
+        "kind": "required",
+        "score": 32.9,
+        "best_evidence": "Python backend development",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Writing and maintaining internal help center documentation",
+        "kind": "preferred",
+        "score": 25.8,
+        "best_evidence": "Built and maintained Python REST APIs for the content management backend.",
+        "evidence_verified": true
+       }
+      ],
+      "behavioral": {
+       "score": 14.4,
+       "volume": 0.6,
+       "focus": 26.4,
+       "originality": 21.4,
+       "timing": 8.0,
+       "notes": [
+        "214 applications in 30 days -- consistent with automated mass application",
+        "Applied roles span unrelated functions -- untargeted search",
+        "Cover letters near-identical across applications -- single generated template",
+        "Submission timing is machine-uniform rather than human-irregular"
+       ]
+      },
+      "history": {
+       "candidate_id": "c_004",
+       "seen_before": false,
+       "prior_verifications": [],
+       "modifier": 0.0,
+       "flags": []
+      },
+      "flags": [
+       "214 applications in 30 days -- consistent with automated mass application",
+       "Applied roles span unrelated functions -- untargeted search",
+       "Cover letters near-identical across applications -- single generated template",
+       "Submission timing is machine-uniform rather than human-irregular"
+      ]
+     }
+    }
+   }
+  },
+  {
+   "candidate_id": "c_005",
+   "name": "Priya Raman",
+   "applications_last_30d": 4,
+   "results": {
+    "j_001": {
+     "candidate_id": "c_005",
+     "name": "Priya Raman",
+     "job_id": "j_001",
+     "trust_score": 95.0,
+     "sub_scores": {
+      "identity": 96.0,
+      "consistency": 93.0,
+      "fit": 95.8
+     },
+     "weights": {
+      "identity": 0.4,
+      "consistency": 0.3,
+      "fit": 0.3
+     },
+     "stage_status": {
+      "identity": "cleared",
+      "consistency": "cleared",
+      "fit": "cleared"
+     },
+     "gates_cleared": true,
+     "reached_human_review": true,
+     "flagged": false,
+     "flags": [
+      "Previously verified with no flags at Northwind Logistics, Cardinal Health Systems"
+     ],
+     "fit_detail": {
+      "fit_score": 95.8,
+      "role_fit": 89.4,
+      "seniority_match": 100.0,
+      "requirement_matches": [
+       {
+        "requirement": "Design and operate distributed systems handling high request volume",
+        "kind": "required",
+        "score": 70.7,
+        "best_evidence": "Distributed systems and event-driven architecture",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Production experience writing backend services in Python or Go",
+        "kind": "required",
+        "score": 100.0,
+        "best_evidence": "Go and Python service development",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Relational database schema design, query optimization, and migrations",
+        "kind": "required",
+        "score": 100.0,
+        "best_evidence": "Database design and migration strategy",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Cloud infrastructure and container orchestration on AWS or GCP",
+        "kind": "required",
+        "score": 100.0,
+        "best_evidence": "GCP infrastructure and Terraform",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Owning on-call rotation and production incident response",
+        "kind": "preferred",
+        "score": 4.1,
+        "best_evidence": "Distributed systems and event-driven architecture",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Experience mentoring engineers and leading technical design reviews",
+        "kind": "preferred",
+        "score": 100.0,
+        "best_evidence": "Technical design review facilitation",
+        "evidence_verified": true
+       }
+      ],
+      "behavioral": {
+       "score": 97.4,
+       "volume": 100.0,
+       "focus": 100.0,
+       "originality": 96.3,
+       "timing": 90.0,
+       "notes": []
+      },
+      "history": {
+       "candidate_id": "c_005",
+       "seen_before": true,
+       "prior_verifications": [
+        {
+         "company": "Northwind Logistics",
+         "date": "2025-11-14",
+         "status": "verified",
+         "reason": "Full three-stage clearance, no flags"
+        },
+        {
+         "company": "Cardinal Health Systems",
+         "date": "2026-03-02",
+         "status": "verified",
+         "reason": "Identity and consistency cleared, role withdrawn by employer"
+        }
+       ],
+       "modifier": 4.0,
+       "flags": [
+        "Previously verified with no flags at Northwind Logistics, Cardinal Health Systems"
+       ]
+      },
+      "flags": [
+       "Previously verified with no flags at Northwind Logistics, Cardinal Health Systems"
+      ]
+     }
+    },
+    "j_002": {
+     "candidate_id": "c_005",
+     "name": "Priya Raman",
+     "job_id": "j_002",
+     "trust_score": 86.1,
+     "sub_scores": {
+      "identity": 96.0,
+      "consistency": 93.0,
+      "fit": 51.8
+     },
+     "weights": {
+      "identity": 0.45,
+      "consistency": 0.35,
+      "fit": 0.2
+     },
+     "stage_status": {
+      "identity": "cleared",
+      "consistency": "cleared",
+      "fit": "cleared"
+     },
+     "gates_cleared": true,
+     "reached_human_review": true,
+     "flagged": false,
+     "flags": [
+      "Previously verified with no flags at Northwind Logistics, Cardinal Health Systems"
+     ],
+     "fit_detail": {
+      "fit_score": 51.8,
+      "role_fit": 26.5,
+      "seniority_match": 70.0,
+      "requirement_matches": [
+       {
+        "requirement": "Responding to customer tickets with clear written communication",
+        "kind": "required",
+        "score": 0.0,
+        "best_evidence": "Distributed systems and event-driven architecture",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "De-escalating frustrated customers and handling refund decisions",
+        "kind": "required",
+        "score": 0.0,
+        "best_evidence": "Senior Software Engineer at Northwind Logistics",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Working in a helpdesk platform such as Zendesk or Intercom",
+        "kind": "required",
+        "score": 47.0,
+        "best_evidence": "Backend Engineer at Halcyon Health",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Writing and maintaining internal help center documentation",
+        "kind": "preferred",
+        "score": 0.0,
+        "best_evidence": "Technical design review facilitation",
+        "evidence_verified": true
+       }
+      ],
+      "behavioral": {
+       "score": 97.4,
+       "volume": 100.0,
+       "focus": 100.0,
+       "originality": 96.3,
+       "timing": 90.0,
+       "notes": []
+      },
+      "history": {
+       "candidate_id": "c_005",
+       "seen_before": true,
+       "prior_verifications": [
+        {
+         "company": "Northwind Logistics",
+         "date": "2025-11-14",
+         "status": "verified",
+         "reason": "Full three-stage clearance, no flags"
+        },
+        {
+         "company": "Cardinal Health Systems",
+         "date": "2026-03-02",
+         "status": "verified",
+         "reason": "Identity and consistency cleared, role withdrawn by employer"
+        }
+       ],
+       "modifier": 4.0,
+       "flags": [
+        "Previously verified with no flags at Northwind Logistics, Cardinal Health Systems"
+       ]
+      },
+      "flags": [
+       "Previously verified with no flags at Northwind Logistics, Cardinal Health Systems"
+      ]
+     }
+    }
+   }
+  },
+  {
+   "candidate_id": "c_006",
+   "name": "Dev Patel",
+   "applications_last_30d": 9,
+   "results": {
+    "j_001": {
+     "candidate_id": "c_006",
+     "name": "Dev Patel",
+     "job_id": "j_001",
+     "trust_score": 90.0,
+     "sub_scores": {
+      "identity": 90.0,
+      "consistency": 0.0,
+      "fit": null
+     },
+     "weights": {
+      "identity": 0.4,
+      "consistency": 0.3,
+      "fit": 0.3
+     },
+     "stage_status": {
+      "identity": "cleared",
+      "consistency": "in_progress",
+      "fit": "not_started"
+     },
+     "gates_cleared": false,
+     "reached_human_review": false,
+     "flagged": false,
+     "flags": [],
+     "fit_detail": null
+    },
+    "j_002": {
+     "candidate_id": "c_006",
+     "name": "Dev Patel",
+     "job_id": "j_002",
+     "trust_score": 90.0,
+     "sub_scores": {
+      "identity": 90.0,
+      "consistency": 0.0,
+      "fit": null
+     },
+     "weights": {
+      "identity": 0.45,
+      "consistency": 0.35,
+      "fit": 0.2
+     },
+     "stage_status": {
+      "identity": "cleared",
+      "consistency": "in_progress",
+      "fit": "not_started"
+     },
+     "gates_cleared": false,
+     "reached_human_review": false,
+     "flagged": false,
+     "flags": [],
+     "fit_detail": null
+    }
+   }
+  },
+  {
+   "candidate_id": "c_007",
+   "name": "Marcus Webb",
+   "applications_last_30d": 18,
+   "results": {
+    "j_001": {
+     "candidate_id": "c_007",
+     "name": "Marcus Webb",
+     "job_id": "j_001",
+     "trust_score": 75.2,
+     "sub_scores": {
+      "identity": 85.0,
+      "consistency": 81.0,
+      "fit": 56.5
+     },
+     "weights": {
+      "identity": 0.4,
+      "consistency": 0.3,
+      "fit": 0.3
+     },
+     "stage_status": {
+      "identity": "cleared",
+      "consistency": "cleared",
+      "fit": "cleared"
+     },
+     "gates_cleared": true,
+     "reached_human_review": true,
+     "flagged": false,
+     "flags": [
+      "Previously flagged at Meridian Fintech: Same voice print matched two applications under different legal names"
+     ],
+     "fit_detail": {
+      "fit_score": 56.5,
+      "role_fit": 78.3,
+      "seniority_match": 100.0,
+      "requirement_matches": [
+       {
+        "requirement": "Design and operate distributed systems handling high request volume",
+        "kind": "required",
+        "score": 100.0,
+        "best_evidence": "Distributed systems",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Production experience writing backend services in Python or Go",
+        "kind": "required",
+        "score": 100.0,
+        "best_evidence": "Python and Go services",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Relational database schema design, query optimization, and migrations",
+        "kind": "required",
+        "score": 0.0,
+        "best_evidence": "Distributed systems",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Cloud infrastructure and container orchestration on AWS or GCP",
+        "kind": "required",
+        "score": 100.0,
+        "best_evidence": "AWS and Kubernetes",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Owning on-call rotation and production incident response",
+        "kind": "preferred",
+        "score": 0.0,
+        "best_evidence": "Distributed systems",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Experience mentoring engineers and leading technical design reviews",
+        "kind": "preferred",
+        "score": 31.4,
+        "best_evidence": "Senior Backend Engineer at Keystone Payments",
+        "evidence_verified": true
+       }
+      ],
+      "behavioral": {
+       "score": 89.0,
+       "volume": 81.9,
+       "focus": 99.6,
+       "originality": 97.0,
+       "timing": 70.0,
+       "notes": []
+      },
+      "history": {
+       "candidate_id": "c_007",
+       "seen_before": true,
+       "prior_verifications": [
+        {
+         "company": "Meridian Fintech",
+         "date": "2026-01-22",
+         "status": "flagged",
+         "reason": "Same voice print matched two applications under different legal names"
+        }
+       ],
+       "modifier": -25.0,
+       "flags": [
+        "Previously flagged at Meridian Fintech: Same voice print matched two applications under different legal names"
+       ]
+      },
+      "flags": [
+       "Previously flagged at Meridian Fintech: Same voice print matched two applications under different legal names"
+      ]
+     }
+    },
+    "j_002": {
+     "candidate_id": "c_007",
+     "name": "Marcus Webb",
+     "job_id": "j_002",
+     "trust_score": 70.0,
+     "sub_scores": {
+      "identity": 85.0,
+      "consistency": 81.0,
+      "fit": 16.8
+     },
+     "weights": {
+      "identity": 0.45,
+      "consistency": 0.35,
+      "fit": 0.2
+     },
+     "stage_status": {
+      "identity": "cleared",
+      "consistency": "cleared",
+      "fit": "cleared"
+     },
+     "gates_cleared": true,
+     "reached_human_review": true,
+     "flagged": false,
+     "flags": [
+      "Previously flagged at Meridian Fintech: Same voice print matched two applications under different legal names"
+     ],
+     "fit_detail": {
+      "fit_score": 16.8,
+      "role_fit": 21.5,
+      "seniority_match": 70.0,
+      "requirement_matches": [
+       {
+        "requirement": "Responding to customer tickets with clear written communication",
+        "kind": "required",
+        "score": 0.0,
+        "best_evidence": "Distributed systems",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "De-escalating frustrated customers and handling refund decisions",
+        "kind": "required",
+        "score": 0.0,
+        "best_evidence": "Senior Backend Engineer at Keystone Payments",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Working in a helpdesk platform such as Zendesk or Intercom",
+        "kind": "required",
+        "score": 21.0,
+        "best_evidence": "Distributed systems",
+        "evidence_verified": true
+       },
+       {
+        "requirement": "Writing and maintaining internal help center documentation",
+        "kind": "preferred",
+        "score": 0.0,
+        "best_evidence": "Senior Backend Engineer at Keystone Payments",
+        "evidence_verified": true
+       }
+      ],
+      "behavioral": {
+       "score": 89.0,
+       "volume": 81.9,
+       "focus": 99.6,
+       "originality": 97.0,
+       "timing": 70.0,
+       "notes": []
+      },
+      "history": {
+       "candidate_id": "c_007",
+       "seen_before": true,
+       "prior_verifications": [
+        {
+         "company": "Meridian Fintech",
+         "date": "2026-01-22",
+         "status": "flagged",
+         "reason": "Same voice print matched two applications under different legal names"
+        }
+       ],
+       "modifier": -25.0,
+       "flags": [
+        "Previously flagged at Meridian Fintech: Same voice print matched two applications under different legal names"
+       ]
+      },
+      "flags": [
+       "Previously flagged at Meridian Fintech: Same voice print matched two applications under different legal names"
+      ]
+     }
+    }
+   }
+  }
+ ]
+}

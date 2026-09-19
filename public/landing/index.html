@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TrustFunnel — Three gates before a human spends a minute</title>
+<meta name="description" content="Identity, Consistency, Fit. Three gated checkpoints and one trust score, so recruiters know which resumes go to the top of the pile.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#10131a; --panel:#171b24; --text:#edeff4; --text-dim:#8b92a5;
+    --gold:#c9a24b; --green:#6fae7c; --red:#d9694f; --blue:#5b93d9;
+    --hairline:#2a2f3c;
+    --gutter:16px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:'Archivo','IBM Plex Sans',sans-serif; margin:0; line-height:1.15}
+  p{margin:0}
+  a{color:var(--gold)}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+  .shell{max-width:1060px; margin:0 auto; padding:0 var(--gutter)}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--text-dim);
+  }
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky; top:0; z-index:20; background:rgba(16,19,26,.92);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--hairline);
+  }
+  .nav-in{display:flex; align-items:center; justify-content:space-between; gap:16px; height:60px}
+  .mark{font-family:'Archivo',sans-serif; font-weight:700; font-size:17px; letter-spacing:-.01em}
+  .mark b{color:var(--gold); font-weight:700}
+  .nav-links{display:flex; align-items:center; gap:18px}
+  .nav-links a{color:var(--text-dim); text-decoration:none; font-size:13px}
+  .nav-links a:hover{color:var(--text)}
+  .cta{
+    display:inline-block; background:var(--gold); color:#10131a; font-weight:600;
+    text-decoration:none; border-radius:6px; padding:9px 15px; font-size:13px; white-space:nowrap;
+  }
+  .cta:hover{filter:brightness(1.07)}
+  .cta.ghost{background:transparent; color:var(--text); border:1px solid var(--hairline); font-weight:500}
+  .cta.ghost:hover{border-color:#3a4152; filter:none}
+  @media (max-width:760px){ .nav-links a:not(.cta){display:none} }
+
+  /* ---------- hero ---------- */
+  .hero{padding:76px 0 60px; border-bottom:1px solid var(--hairline)}
+  .hero h1{font-size:clamp(34px,5.4vw,58px); letter-spacing:-.02em; max-width:17ch}
+  .hero h1 .hl{color:var(--gold)}
+  .hero .lede{margin-top:22px; font-size:clamp(16px,2vw,19px); color:var(--text-dim); max-width:58ch}
+  .hero-actions{display:flex; gap:10px; margin-top:30px; flex-wrap:wrap}
+
+  /* ---------- section frame ---------- */
+  section{padding:64px 0; border-bottom:1px solid var(--hairline)}
+  .sec-head{max-width:62ch; margin-bottom:34px}
+  .sec-head h2{font-size:clamp(23px,3.2vw,31px); letter-spacing:-.015em; margin-top:10px}
+  .sec-head p{margin-top:14px; color:var(--text-dim)}
+
+  /* ---------- problem ---------- */
+  .asks{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin-top:8px}
+  .ask{
+    background:var(--panel); border:1px solid var(--hairline); border-left:2px solid var(--gold);
+    border-radius:8px; padding:18px;
+  }
+  .ask .q{font-family:'Archivo',sans-serif; font-weight:600; font-size:16px}
+  .ask .a{color:var(--text-dim); font-size:13px; margin-top:7px}
+  .ask .g{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--gold); margin-top:12px; display:block;
+  }
+
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr)); gap:1px; margin-top:34px; background:var(--hairline); border:1px solid var(--hairline); border-radius:8px; overflow:hidden}
+  .stat{background:var(--bg); padding:18px}
+  .stat .n{font-family:'Archivo',sans-serif; font-weight:700; font-size:27px; color:var(--gold)}
+  .stat .t{font-size:12.5px; color:var(--text-dim); margin-top:5px}
+  .stat .src{font-family:'IBM Plex Mono',monospace; font-size:10px; color:#5f6678; margin-top:8px}
+
+  /* ---------- funnel ---------- */
+  .funnel{display:grid; grid-template-columns:1fr 300px; gap:34px; align-items:start}
+  @media (max-width:860px){ .funnel{grid-template-columns:1fr} }
+  .gate{
+    display:grid; grid-template-columns:44px 1fr; gap:16px;
+    background:var(--panel); border:1px solid var(--hairline); border-radius:8px;
+    padding:18px; margin-bottom:12px; position:relative;
+  }
+  .gate .num{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--gold);
+    border:1px solid var(--gold); border-radius:6px; height:38px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .gate h3{font-size:17px}
+  .gate .goal{color:var(--text-dim); font-size:13.5px; margin-top:5px}
+  .gate ul{margin:11px 0 0; padding-left:17px; color:var(--text-dim); font-size:13px}
+  .gate li{margin-bottom:4px}
+  .gate .out{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text);
+    margin-top:12px; padding-top:10px; border-top:1px solid var(--hairline);
+  }
+  .gate .out .arrow{color:var(--gold)}
+  .gate-link{
+    position:absolute; top:16px; right:16px; font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px; color:var(--text-dim); text-decoration:none;
+    border:1px solid var(--hairline); border-radius:4px; padding:3px 7px;
+  }
+  .gate-link:hover{color:var(--gold); border-color:var(--gold)}
+
+  .gatebar{
+    display:flex; align-items:center; gap:9px; margin:0 0 12px 60px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--red);
+  }
+  .gatebar .line{flex:1; height:1px; background:linear-gradient(90deg,var(--red),transparent)}
+
+  /* score card */
+  .scorecard{
+    background:var(--panel); border:1px solid var(--hairline); border-radius:8px;
+    padding:20px; position:sticky; top:80px;
+  }
+  .scorecard .big{font-family:'Archivo',sans-serif; font-weight:700; font-size:50px; color:var(--green); line-height:1}
+  .scorecard .sub{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-dim); margin-top:5px}
+  .srow{display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:13px; padding:9px 0; border-top:1px solid var(--hairline)}
+  .srow .w{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-dim)}
+  .srow .v{font-family:'IBM Plex Mono',monospace}
+  .srow .v.g{color:var(--green)}
+  .scorecard .foot{font-size:12px; color:var(--text-dim); margin-top:14px; padding-top:13px; border-top:1px solid var(--hairline)}
+
+  /* ---------- outcome ---------- */
+  .queue{border:1px solid var(--hairline); border-radius:8px; overflow:hidden}
+  .qhead{
+    display:flex; justify-content:space-between; gap:12px; padding:11px 16px;
+    background:var(--panel); border-bottom:1px solid var(--hairline);
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--text-dim);
+  }
+  .qrow{display:flex; align-items:center; gap:13px; padding:13px 16px; border-bottom:1px solid var(--hairline)}
+  .qrow:last-child{border-bottom:none}
+  .qrow .rank{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text-dim); width:18px; flex:none}
+  .qrow .who{flex:1; min-width:0}
+  .qrow .who .nm{font-weight:600; font-size:14px}
+  .qrow .who .fl{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-dim); margin-top:2px}
+  .qrow .sc{font-family:'Archivo',sans-serif; font-weight:700; font-size:21px; flex:none}
+  .qrow.held{background:rgba(217,105,79,.06)}
+  .qrow.held .sc{color:var(--red)}
+  .qrow .sc.g{color:var(--green)} .qrow .sc.a{color:var(--gold)}
+  .qnote{padding:13px 16px; background:var(--panel); font-size:12.5px; color:var(--text-dim)}
+
+  /* ---------- close ---------- */
+  .close{padding:72px 0; text-align:center}
+  .close h2{font-size:clamp(24px,3.6vw,34px); letter-spacing:-.015em; max-width:20ch; margin:0 auto}
+  .close p{color:var(--text-dim); margin-top:16px; max-width:52ch; margin-left:auto; margin-right:auto}
+  .close .hero-actions{justify-content:center}
+
+  footer{border-top:1px solid var(--hairline); padding:26px 0; color:#5f6678; font-size:12px}
+  .foot-in{display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap}
+  footer a{color:var(--text-dim); text-decoration:none; margin-left:16px}
+  footer a:hover{color:var(--text)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="shell nav-in">
+    <div class="mark">Trust<b>Funnel</b></div>
+    <div class="nav-links">
+      <a href="#problem">The problem</a>
+      <a href="#funnel">The funnel</a>
+      <a href="#score">Trust score</a>
+      <a class="cta" href="/">Open the dashboard</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="shell">
+    <div class="eyebrow">Trust in the hiring funnel</div>
+    <h1 style="margin-top:18px">Three gates before a human spends <span class="hl">a single minute</span>.</h1>
+    <p class="lede">
+      AI-generated applications clear the ATS in volume. TrustFunnel answers the three questions
+      a recruiter is left holding — is this a real person, is the experience genuine, and is it a fit —
+      then ranks what's left so the right resumes reach the top of the pile.
+    </p>
+    <div class="hero-actions">
+      <a class="cta" href="/">See the recruiter queue</a>
+      <a class="cta ghost" href="#funnel">How the funnel works</a>
+    </div>
+  </div>
+</header>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="shell">
+    <div class="sec-head">
+      <div class="eyebrow">The problem</div>
+      <h2>The ATS stopped being a filter.</h2>
+      <p>
+        Generated applications pass keyword screening by design — that is what they are optimized for.
+        The volume lands on a recruiter who now has to answer three questions per candidate, by hand,
+        with nothing but a PDF and a video call to go on.
+      </p>
+    </div>
+
+    <div class="asks">
+      <div class="ask">
+        <div class="q">Is this a real person?</div>
+        <div class="a">Not a deepfake, not a proxy sitting in on the interview, not one face applying under four names.</div>
+        <span class="g">→ Gate 1 · Identity</span>
+      </div>
+      <div class="ask">
+        <div class="q">How genuine is the experience?</div>
+        <div class="a">Was the resume written or pasted, do the titles and dates survive contact with public record, does LinkedIn tell the same story.</div>
+        <span class="g">→ Gate 2 · Consistency</span>
+      </div>
+      <div class="ask">
+        <div class="q">Is this candidate a good fit?</div>
+        <div class="a">Does verified experience actually match the posting, and have we seen this person before.</div>
+        <span class="g">→ Gate 3 · Fit</span>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="n">41%</div>
+        <div class="t">of organizations have hired a fraudulent candidate without knowing it</div>
+        <div class="src">GetReal Security</div>
+      </div>
+      <div class="stat">
+        <div class="n">1,300%</div>
+        <div class="t">rise in deepfake hiring fraud in 2024</div>
+        <div class="src">Pindrop</div>
+      </div>
+      <div class="stat">
+        <div class="n">70 min</div>
+        <div class="t">to build a convincing deepfake candidate, with zero technical skill</div>
+        <div class="src">HR Dive</div>
+      </div>
+      <div class="stat">
+        <div class="n">55.5%</div>
+        <div class="t">human accuracy detecting deepfakes — barely better than a coin flip</div>
+        <div class="src">2025 meta-analysis, 56 studies</div>
+      </div>
+      <div class="stat">
+        <div class="n">1 in 4</div>
+        <div class="t">candidate profiles worldwide could be fake by 2028</div>
+        <div class="src">Gartner</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FUNNEL -->
+<section id="funnel">
+  <div class="shell">
+    <div class="sec-head">
+      <div class="eyebrow">How it works</div>
+      <h2>Not one clever trick. A funnel.</h2>
+      <p>
+        Three gated checkpoints. Each one has to clear before the next runs — so nobody
+        evaluates the resume quality of a person who isn't real, and nobody scores the fit
+        of a resume that doesn't hold up.
+      </p>
+    </div>
+
+    <div class="funnel">
+      <div>
+        <div class="gate">
+          <div class="num">01</div>
+          <div>
+            <a class="gate-link" href="/identity.html">open ↗</a>
+            <h3>Identity</h3>
+            <div class="goal">Prove this is a real, specific, live human.</div>
+            <ul>
+              <li>Face and government-ID baseline at signup</li>
+              <li>Unscripted reaction challenge mid-interview — face-swap tools break on spontaneous movement</li>
+              <li>Lip-sync and voice-pitch drift sampled across the call, not once</li>
+              <li>Same face or voice print appearing under other names</li>
+            </ul>
+            <div class="out">Identity Score <span class="arrow">→</span> must clear to unlock Gate 2</div>
+          </div>
+        </div>
+        <div class="gatebar"><span>fails here → held, Gates 2 and 3 never run</span><span class="line"></span></div>
+
+        <div class="gate">
+          <div class="num">02</div>
+          <div>
+            <a class="gate-link" href="/stage2/index.html">open ↗</a>
+            <h3>Consistency</h3>
+            <div class="goal">Confirm the application material is genuine and internally consistent.</div>
+            <ul>
+              <li>Resume provenance — built over sessions, or pasted in as one finished block</li>
+              <li>Keystroke rhythm: human hesitation vs. flat machine timing</li>
+              <li>Titles, dates and companies against what's publicly verifiable</li>
+              <li>LinkedIn cross-check, including whether the profile itself looks real</li>
+            </ul>
+            <div class="out">Consistency Score <span class="arrow">→</span> must clear to unlock Gate 3</div>
+          </div>
+        </div>
+        <div class="gatebar"><span>fails here → stays ranked, flagged, fit never scored</span><span class="line"></span></div>
+
+        <div class="gate">
+          <div class="num">03</div>
+          <div>
+            <a class="gate-link" href="/stage3/index.html">open ↗</a>
+            <h3>Fit</h3>
+            <div class="goal">Is this a good match, and have we seen them before?</div>
+            <ul>
+              <li>Semantic match of <em>verified</em> experience against the posting — unverified claims are discounted, not trusted</li>
+              <li>Prior TrustFunnel history across companies: cleared clean, or flagged and why</li>
+              <li>Behavioral pattern — a focused search, or 200 generated applications</li>
+            </ul>
+            <div class="out">Fit Score <span class="arrow">→</span> combines into the final number</div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="scorecard" id="score">
+        <div class="eyebrow">Combined trust score</div>
+        <div class="big" style="margin-top:10px">95</div>
+        <div class="sub">strict posting · all three gates cleared</div>
+        <div style="margin-top:16px">
+          <div class="srow"><span>Identity <span class="w">×0.40</span></span><span class="v g">96</span></div>
+          <div class="srow"><span>Consistency <span class="w">×0.30</span></span><span class="v g">93</span></div>
+          <div class="srow"><span>Fit <span class="w">×0.30</span></span><span class="v g">96</span></div>
+        </div>
+        <div class="foot">
+          The recruiter sets the bar per posting. High-volume roles can clear on Gates 1 and 2.
+          Roles with system access, financial permissions or remote-only work require all three, every time.
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- OUTCOME -->
+<section>
+  <div class="shell">
+    <div class="sec-head">
+      <div class="eyebrow">What the recruiter sees</div>
+      <h2>One ranked queue. Nothing silently deleted.</h2>
+      <p>
+        The score decides the order, not the outcome. Candidates who fail identity stay visible in a
+        held section instead of vanishing, and anyone mid-pipeline reads as in progress rather than
+        scoring low for work that hasn't finished.
+      </p>
+    </div>
+
+    <div class="queue">
+      <div class="qhead"><span>Human review queue · highest trust first</span><span>Senior Backend Engineer · strict</span></div>
+      <div class="qrow"><span class="rank">1</span><span class="who"><span class="nm">Priya Raman</span><span class="fl">cleared all three · previously verified, no flags</span></span><span class="sc g">95</span></div>
+      <div class="qrow"><span class="rank">2</span><span class="who"><span class="nm">Maya Chen</span><span class="fl">cleared all three · focused search</span></span><span class="sc g">94</span></div>
+      <div class="qrow"><span class="rank">3</span><span class="who"><span class="nm">Marcus Webb</span><span class="fl">strong on paper · one voice print, two legal names elsewhere</span></span><span class="sc a">75</span></div>
+      <div class="qrow"><span class="rank">4</span><span class="who"><span class="nm">Sam Okafor</span><span class="fl">214 applications in 30 days · identical cover letters</span></span><span class="sc a">69</span></div>
+      <div class="qrow held"><span class="rank">—</span><span class="who"><span class="nm">Alex Rivera</span><span class="fl">held at identity · face mesh collapsed on the reaction challenge</span></span><span class="sc">12</span></div>
+      <div class="qnote">
+        Marcus and Sam both cleared Gates 1 and 2. Gate 3 is what separated them from the top of the pile.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSE -->
+<section class="close" style="border-bottom:none">
+  <div class="shell">
+    <h2>The system ranks. You decide.</h2>
+    <p>
+      It's a queue, not a filter. TrustFunnel tells a recruiter who has earned the next
+      thirty minutes of their attention — and shows its work on every candidate.
+    </p>
+    <div class="hero-actions">
+      <a class="cta" href="/">Open the recruiter queue</a>
+      <a class="cta ghost" href="/stage3/index.html">See a score broken down</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="shell foot-in">
+    <span>TrustFunnel · Trust in the Hiring Funnel — localhost:nyc × Integral Recruiting × NYU</span>
+    <span>
+      <a href="/identity.html">Identity</a>
+      <a href="/stage2/index.html">Consistency</a>
+      <a href="/stage3/index.html">Fit</a>
+      <a href="/">Dashboard</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>

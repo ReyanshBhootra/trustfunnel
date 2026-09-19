@@ -1,4 +1,12 @@
+# Node / Vite dashboard
 node_modules
 dist
-.DS_Store
 *.local
+
+# Python / Stage 3 scoring service
+.venv/
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
