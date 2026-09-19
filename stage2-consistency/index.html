@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stage 2 — Resume &amp; Profile Consistency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #10131a;
+    --panel: #171b24;
+    --panel-2: #1d222d;
+    --hairline: #2a2f3c;
+    --text: #edeff4;
+    --text-dim: #8b92a5;
+    --gold: #c9a24b;
+    --red: #d9694f;
+    --blue: #5b93d9;
+    --green: #6fae7c;
+    --radius: 3px;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  h1, h2, h3 { font-family: 'Archivo', 'IBM Plex Sans', sans-serif; margin: 0; }
+  .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--hairline);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  header h1 { font-size: 17px; font-weight: 700; letter-spacing: 0.01em; }
+  header .sub { color: var(--text-dim); font-size: 13px; }
+  header .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 3px 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  header .badge input {
+    background: transparent; border: none; color: var(--gold);
+    font-family: inherit; font-size: inherit; width: 96px; padding: 0; outline: none;
+  }
+
+  main {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 1px;
+    background: var(--hairline);
+    min-height: calc(100vh - 74px);
+  }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+
+  .input-col, .log-col { background: var(--bg); padding: 24px 28px; min-width: 0; }
+
+  .stage-rail { display: flex; gap: 6px; margin-bottom: 18px; }
+  .stage-rail .dot { flex: 1; height: 3px; background: var(--hairline); border-radius: 2px; position: relative; overflow: hidden; }
+  .stage-rail .dot.done { background: var(--gold); }
+  .stage-rail .dot.active::after { content: ''; position: absolute; inset: 0; background: var(--blue); animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .stage-rail .dot.active::after { animation: none; opacity: 1; } }
+
+  .stage-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--text-dim); margin-bottom: 24px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .stage-labels span.current { color: var(--text); }
+
+  .field { margin-bottom: 16px; }
+  .field-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .field label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.03em; }
+  .field .meta { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); }
+  .field .meta b { color: var(--text); font-weight: 500; }
+  textarea, input[type=text], input[type=number], input[type=password], select {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  textarea:focus, input:focus, select:focus { border-color: var(--blue); }
+  textarea { resize: vertical; min-height: 120px; }
+  textarea#resume { min-height: 170px; }
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  @media (max-width: 520px) { .row-3 { grid-template-columns: 1fr; } }
+
+  .llm-box {
+    border: 1px solid var(--hairline); border-radius: 6px; padding: 14px 16px; background: var(--panel);
+    margin-bottom: 16px;
+  }
+  .llm-box .title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 0.04em; margin-bottom: 10px; }
+  .llm-grid { display: grid; grid-template-columns: 130px 1fr 1fr; gap: 10px; }
+  @media (max-width: 620px) { .llm-grid { grid-template-columns: 1fr; } }
+  .llm-box .note { font-size: 11.5px; color: var(--text-dim); margin-top: 8px; line-height: 1.5; }
+  .llm-box .note code { font-family: 'IBM Plex Mono', monospace; color: var(--text); }
+
+  .actions { margin-top: 4px; display: flex; gap: 10px; flex-wrap: wrap; }
+  button {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--hairline);
+    background: var(--panel-2);
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  button:hover:not(:disabled) { border-color: var(--gold); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+  button.primary { background: var(--gold); color: #17140b; border-color: var(--gold); font-weight: 600; }
+  button.primary:hover:not(:disabled) { background: #d6ae55; }
+
+  .log-col { display: flex; flex-direction: column; gap: 16px; }
+  .log-col h2 { font-size: 14px; margin-bottom: 4px; }
+  .log-col .hint { font-size: 12px; color: var(--text-dim); }
+
+  .panel { background: var(--panel); border: 1px solid var(--hairline); border-radius: 6px; padding: 16px; }
+  .panel .label { font-size: 12px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace; }
+
+  /* provenance heatmap */
+  .heat-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .legend { display: flex; gap: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--text-dim); }
+  .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+  .heatmap { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+  .heat-block {
+    border-left: 3px solid var(--green);
+    background: var(--panel-2);
+    padding: 7px 10px;
+    font-size: 12px; line-height: 1.45;
+    color: var(--text);
+    display: flex; gap: 10px; justify-content: space-between; align-items: flex-start;
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .heat-block .txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .heat-block .tag { font-family: 'IBM Plex Mono', monospace; font-size: 10px; flex-shrink: 0; color: var(--green); }
+  .heat-block.pasted { border-left-color: var(--red); }
+  .heat-block.pasted .tag { color: var(--red); }
+  .heat-block.mixed { border-left-color: var(--gold); }
+  .heat-block.mixed .tag { color: var(--gold); }
+  .heat-empty { font-size: 12px; color: var(--text-dim); padding: 8px 0; }
+
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+  @media (max-width: 520px) { .metrics { grid-template-columns: 1fr 1fr; } }
+  .metric { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 8px 10px; }
+  .metric .n { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-dim); }
+  .metric .v { font-family: 'Archivo', sans-serif; font-size: 17px; font-weight: 600; margin-top: 1px; }
+  .metric .v.bad { color: var(--red); }
+  .metric .v.ok { color: var(--green); }
+  canvas#spark { width: 100%; height: 44px; display: block; margin-top: 12px; }
+
+  .log-feed {
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; line-height: 1.9;
+    overflow-y: auto; max-height: 210px;
+  }
+  .log-feed .row { display: flex; gap: 10px; color: var(--text-dim); }
+  .log-feed .row .t { flex-shrink: 0; opacity: 0.6; }
+  .log-feed .row.pass .m { color: var(--green); }
+  .log-feed .row.warn .m { color: var(--red); }
+  .log-feed .row.info .m { color: var(--text); }
+
+  .score-card .big-score {
+    font-family: 'Archivo', sans-serif;
+    font-size: 44px; font-weight: 700;
+    margin: 4px 0 14px; color: var(--gold);
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  .score-card .big-score.unset { color: var(--text-dim); }
+  .score-card .big-score .status { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.06em; padding: 3px 8px; border-radius: var(--radius); border: 1px solid var(--hairline); color: var(--text-dim); }
+  .score-card .big-score .status.cleared { color: var(--green); border-color: var(--green); }
+  .score-card .big-score .status.flagged { color: var(--red); border-color: var(--red); }
+  .sub-scores { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  @media (max-width: 520px) { .sub-scores { grid-template-columns: 1fr; } }
+  .sub-score { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 10px 12px; }
+  .sub-score .n { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); }
+  .sub-score .v { font-family: 'Archivo', sans-serif; font-size: 20px; font-weight: 600; margin-top: 2px; }
+  .sub-score .w { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-dim); }
+
+  .flags { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .flag { display: grid; grid-template-columns: 8px 1fr; gap: 10px; align-items: start; font-size: 12px; line-height: 1.45; padding: 7px 10px; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--panel-2); }
+  .flag i { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; background: var(--text-dim); }
+  .flag.high i { background: var(--red); }
+  .flag.medium i { background: var(--gold); }
+  .flag.low i { background: var(--blue); }
+  .flag code { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--text-dim); margin-right: 6px; }
+  .flag .ev { color: var(--text-dim); font-size: 11.5px; margin-top: 2px; }
+  .flag-empty { font-size: 12px; color: var(--text-dim); }
+
+  .json-box {
+    background: #0c0e13;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px; line-height: 1.6;
+    color: #a9b3c9;
+    white-space: pre-wrap; word-break: break-word;
+    max-height: 200px; overflow-y: auto;
+  }
+  .copy-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+  .copy-row button { font-size: 12px; padding: 6px 12px; }
+
+  .trace { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; line-height: 1.8; color: var(--text-dim); max-height: 160px; overflow-y: auto; }
+  .trace .tr { display: grid; grid-template-columns: 1fr auto auto; gap: 14px; }
+  .trace .tr .d { color: var(--red); }
+  .trace .tr .d.plus { color: var(--green); }
+  .trace .tr .d.zero { color: var(--text-dim); }
+  .trace .tr .s { color: var(--text); }
+
+  footer {
+    padding: 14px 28px;
+    border-top: 1px solid var(--hairline);
+    font-size: 11px; color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>TrustFunnel — Stage 2</h1>
+    <div class="sub">Resume &amp; Profile Consistency module</div>
+  </div>
+  <div class="badge">CANDIDATE_ID: <input id="candId" value="DEMO-0142" spellcheck="false" aria-label="Candidate ID"></div>
+</header>
+
+<main>
+  <section class="input-col">
+    <div class="stage-rail">
+      <div class="dot" id="dot-1"></div>
+      <div class="dot" id="dot-2"></div>
+      <div class="dot" id="dot-3"></div>
+      <div class="dot" id="dot-4"></div>
+    </div>
+    <div class="stage-labels">
+      <span id="lbl-1" class="current">Provenance</span>
+      <span id="lbl-2">Claim cross-check</span>
+      <span id="lbl-3">Profile plausibility</span>
+      <span id="lbl-4">Consistency score</span>
+    </div>
+
+    <div class="field">
+      <div class="field-head">
+        <label for="resume">RESUME — type or paste; provenance is recorded live</label>
+        <span class="meta" id="resumeMeta">typed <b>0</b> · pasted <b>0</b></span>
+      </div>
+      <textarea id="resume" spellcheck="false" placeholder="Paste a finished resume here and watch the heatmap turn red. Type it and it stays green."></textarea>
+    </div>
+
+    <div class="field">
+      <div class="field-head">
+        <label for="cover">COVER LETTER (optional)</label>
+        <span class="meta" id="coverMeta">typed <b>0</b> · pasted <b>0</b></span>
+      </div>
+      <textarea id="cover" spellcheck="false" style="min-height:90px" placeholder="Optional. Checked against the resume and LinkedIn as one set."></textarea>
+    </div>
+
+    <div class="field">
+      <div class="field-head">
+        <label for="linkedin">LINKEDIN — candidate pastes their own Experience section (no scraping)</label>
+        <span class="meta">self-reported</span>
+      </div>
+      <textarea id="linkedin" spellcheck="false" style="min-height:100px" placeholder="Copy the Experience section from your LinkedIn profile and paste it here."></textarea>
+    </div>
+
+    <div class="field">
+      <div class="row-3">
+        <div>
+          <label for="conn">CONNECTIONS</label>
+          <input type="number" id="conn" min="0" placeholder="e.g. 412">
+        </div>
+        <div>
+          <label for="followers">FOLLOWERS</label>
+          <input type="number" id="followers" min="0" placeholder="e.g. 455">
+        </div>
+        <div>
+          <label for="created">PROFILE CREATED (YEAR)</label>
+          <input type="number" id="created" min="2003" max="2030" placeholder="e.g. 2019">
+        </div>
+      </div>
+    </div>
+
+    <div class="llm-box">
+      <div class="title">CROSS-CHECK MODEL — bring your own key, stays in this tab only</div>
+      <div class="llm-grid">
+        <select id="provider" aria-label="Provider">
+          <option value="demo">Demo mode (no key)</option>
+          <option value="openai">ChatGPT (OpenAI)</option>
+          <option value="anthropic">Claude (Anthropic)</option>
+          <option value="gemini">Gemini (Google)</option>
+        </select>
+        <input type="text" id="model" placeholder="model id" aria-label="Model id" spellcheck="false">
+        <input type="password" id="apikey" placeholder="API key" aria-label="API key" autocomplete="off">
+      </div>
+      <div class="note" id="llmNote">Demo mode replays a pre-computed cross-check for the two fixture candidates. Pick a provider and paste a key to run the real thing on any text. Keys live in <code>sessionStorage</code> and never leave this browser except to the provider you chose.</div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="runBtn">Run consistency check</button>
+      <button id="demoHonestBtn">Load demo: honest</button>
+      <button id="demoFraudBtn">Load demo: fraud</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+  </section>
+
+  <section class="log-col">
+    <div class="panel">
+      <div class="heat-head">
+        <div>
+          <h2>Resume provenance</h2>
+          <div class="hint">Timing only — the page never records which keys were pressed.</div>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--green)"></i>typed</span>
+          <span><i style="background:var(--gold)"></i>mixed</span>
+          <span><i style="background:var(--red)"></i>pasted</span>
+        </div>
+      </div>
+      <div class="heatmap" id="heatmap"><div class="heat-empty">Start typing or paste into the resume box.</div></div>
+      <canvas id="spark" aria-label="Text growth over time"></canvas>
+      <div class="metrics">
+        <div class="metric"><div class="n">paste_ratio</div><div class="v" id="m-paste">—</div></div>
+        <div class="metric"><div class="n">rhythm_cv</div><div class="v" id="m-cv">—</div></div>
+        <div class="metric"><div class="n">backspace_ratio</div><div class="v" id="m-bs">—</div></div>
+        <div class="metric"><div class="n">think_pauses</div><div class="v" id="m-pause">—</div></div>
+      </div>
+    </div>
+
+    <div>
+      <h2>Verification log</h2>
+      <div class="hint" style="margin-bottom:8px">Each signal and the points it moved.</div>
+      <div class="log-feed" id="logFeed">
+        <div class="row info"><span class="t">00:00</span><span class="m">Waiting for input…</span></div>
+      </div>
+    </div>
+
+    <div class="panel score-card">
+      <div class="label">STAGE2_CONSISTENCY_SCORE</div>
+      <div class="big-score unset" id="bigScore"><span id="bigNum">—</span><span class="status" id="bigStatus">not_started</span></div>
+
+      <div class="sub-scores">
+        <div class="sub-score"><div class="n">provenance</div><div class="v" id="s-prov">—</div><div class="w">weight 0.30</div></div>
+        <div class="sub-score"><div class="n">claim_consistency</div><div class="v" id="s-claims">—</div><div class="w">weight 0.50</div></div>
+        <div class="sub-score"><div class="n">profile_plausibility</div><div class="v" id="s-profile">—</div><div class="w">weight 0.20</div></div>
+      </div>
+
+      <div class="label" style="margin-bottom:6px;">FLAGS</div>
+      <div class="flags" id="flags"><div class="flag-empty">None yet.</div></div>
+
+      <div class="label" style="margin-bottom:6px;">SCORE TRACE</div>
+      <div class="trace" id="trace"><div class="flag-empty">Run the check to see the math.</div></div>
+
+      <div class="label" style="margin:14px 0 6px;">OUTPUT (for Stage 3 / dashboard)</div>
+      <div class="json-box" id="jsonOut">{ "status": "not_started" }</div>
+      <div class="copy-row">
+        <button id="copyBtn">Copy JSON</button>
+        <button id="exportBtn">Save to localStorage</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  AI-polished wording is not penalized — only paste provenance, factual contradictions across resume / cover letter / LinkedIn, and thin or brand-new profiles move the score. Score = 0.30·provenance + 0.50·claims + 0.20·profile; ≥ 60 clears Stage 2. Output is written to <span class="mono">localStorage["trustfunnel.stage2.&lt;candidate_id&gt;"]</span> for the dashboard.
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- DOM ----------
+  const $ = id => document.getElementById(id);
+  const resumeEl = $('resume'), coverEl = $('cover'), linkedinEl = $('linkedin');
+  const connEl = $('conn'), followersEl = $('followers'), createdEl = $('created');
+  const providerEl = $('provider'), modelEl = $('model'), apikeyEl = $('apikey'), llmNote = $('llmNote');
+  const runBtn = $('runBtn'), resetBtn = $('resetBtn'), copyBtn = $('copyBtn'), exportBtn = $('exportBtn');
+  const logFeed = $('logFeed'), heatmap = $('heatmap'), spark = $('spark');
+  const jsonOut = $('jsonOut'), bigScore = $('bigScore'), bigNum = $('bigNum'), bigStatus = $('bigStatus');
+  const flagsEl = $('flags'), traceEl = $('trace');
+  const dots = [1, 2, 3, 4].map(n => $('dot-' + n));
+  const labels = [1, 2, 3, 4].map(n => $('lbl-' + n));
+
+  const WEIGHTS = { provenance: 0.30, claims: 0.50, profile: 0.20 };
+  const GATE = 60;
+
+  // ---------- provenance tracker (timing only, never key identity) ----------
+  function makeTracker(el, metaEl) {
+    const st = {
+      typedChars: 0, pastedChars: 0, backspaces: 0,
+      pastes: [],           // { text, len, t }
+      ikis: [], holds: [], pauses: 0,
+      lastKeyT: null, downT: new Map(), startT: null,
+      timeline: [],         // { t, len }
+      override: null        // fixture metrics
+    };
+    const now = () => performance.now();
+    const mark = () => {
+      if (st.startT === null) st.startT = now();
+      st.timeline.push({ t: (now() - st.startT) / 1000, len: el.value.length });
+      if (st.timeline.length > 2000) st.timeline.shift();
+    };
+    el.addEventListener('keydown', e => {
+      st.override = null;
+      const t = now();
+      if (st.startT === null) st.startT = t;
+      if (e.key === 'Backspace' || e.key === 'Delete') st.backspaces++;
+      if (st.lastKeyT !== null) {
+        const gap = t - st.lastKeyT;
+        if (gap >= 2000) st.pauses++; else st.ikis.push(gap);
+      }
+      st.lastKeyT = t;
+      st.downT.set(e.code || e.key, t);
+    });
+    el.addEventListener('keyup', e => {
+      const d = st.downT.get(e.code || e.key);
+      if (d !== undefined) { st.holds.push(now() - d); st.downT.delete(e.code || e.key); }
+    });
+    el.addEventListener('paste', e => {
+      st.override = null;
+      const text = (e.clipboardData && e.clipboardData.getData('text')) || '';
+      if (text.length) st.pastes.push({ text, len: text.length, t: now() });
+      st.pastedChars += text.length;
+    });
+    el.addEventListener('drop', e => {
+      const text = (e.dataTransfer && e.dataTransfer.getData('text')) || '';
+      if (text.length) { st.pastes.push({ text, len: text.length, t: now() }); st.pastedChars += text.length; }
+    });
+    el.addEventListener('input', e => {
+      const it = e.inputType || '';
+      if (it === 'insertText' || it === 'insertLineBreak' || it === 'insertCompositionText') st.typedChars += (e.data || (it === 'insertLineBreak' ? '\n' : '')).length;
+      mark();
+      if (metaEl) metaEl.innerHTML = 'typed <b>' + st.typedChars + '</b> · pasted <b>' + st.pastedChars + '</b>';
+      if (el === resumeEl) renderProvenance();
+    });
+    return st;
+  }
+
+  const trackers = { resume: makeTracker(resumeEl, $('resumeMeta')), cover: makeTracker(coverEl, $('coverMeta')) };
+
+  function cv(arr) {
+    if (arr.length < 2) return null;
+    const m = arr.reduce((a, b) => a + b, 0) / arr.length;
+    if (!m) return null;
+    const v = arr.reduce((a, b) => a + (b - m) * (b - m), 0) / arr.length;
+    return Math.sqrt(v) / m;
+  }
+
+  function metricsOf(st, el) {
+    if (st.override) return st.override;
+    const len = el.value.length;
+    const largest = st.pastes.reduce((a, p) => Math.max(a, p.len), 0);
+    return {
+      final_chars: len,
+      typed_chars: st.typedChars,
+      pasted_chars: st.pastedChars,
+      paste_ratio: len ? Math.min(1, st.pastedChars / len) : 0,
+      largest_paste_ratio: len ? Math.min(1, largest / len) : 0,
+      rhythm_cv: st.ikis.length >= 20 ? cv(st.ikis) : null,
+      hold_cv: st.holds.length >= 20 ? cv(st.holds) : null,
+      backspace_ratio: st.typedChars ? st.backspaces / st.typedChars : 0,
+      think_pauses: st.pauses,
+      session_seconds: st.startT === null ? 0 : Math.round((performance.now() - st.startT) / 1000),
+      paste_events: st.pastes.length
+    };
+  }
+
+  const norm = s => s.replace(/\s+/g, ' ').trim().toLowerCase();
+
+  function paragraphs(text) {
+    let parts = text.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+    if (parts.length <= 1) parts = text.split(/\n/).map(s => s.trim()).filter(Boolean);
+    return parts;
+  }
+
+  function coverage(par, pastes) {
+    const p = norm(par);
+    if (!p) return 0;
+    let cov = 0;
+    for (const paste of pastes) {
+      const q = norm(paste.text);
+      if (q.length < 12) continue;
+      if (q.includes(p)) return 1;
+      if (p.includes(q)) cov += q.length / p.length;
+    }
+    return Math.min(1, cov);
+  }
+
+  function renderProvenance() {
+    const st = trackers.resume;
+    const text = resumeEl.value;
+    const pars = paragraphs(text);
+    heatmap.innerHTML = '';
+    if (!pars.length) {
+      heatmap.innerHTML = '<div class="heat-empty">Start typing or paste into the resume box.</div>';
+    } else {
+      for (const par of pars) {
+        const c = coverage(par, st.pastes);
+        const cls = c >= 0.8 ? 'pasted' : c >= 0.3 ? 'mixed' : '';
+        const tag = c >= 0.8 ? 'PASTED ' + Math.round(c * 100) + '%' : c >= 0.3 ? 'MIXED ' + Math.round(c * 100) + '%' : 'TYPED';
+        const d = document.createElement('div');
+        d.className = 'heat-block ' + cls;
+        d.innerHTML = '<span class="txt"></span><span class="tag">' + tag + '</span>';
+        d.querySelector('.txt').textContent = par;
+        heatmap.appendChild(d);
+      }
+    }
+    const m = metricsOf(st, resumeEl);
+    setMetric('m-paste', pct(m.paste_ratio), m.paste_ratio >= 0.6 ? 'bad' : m.paste_ratio <= 0.3 ? 'ok' : '');
+    setMetric('m-cv', m.rhythm_cv === null ? '—' : m.rhythm_cv.toFixed(2), m.rhythm_cv === null ? '' : m.rhythm_cv < 0.25 ? 'bad' : 'ok');
+    setMetric('m-bs', pct(m.backspace_ratio), '');
+    setMetric('m-pause', String(m.think_pauses), '');
+    drawSpark(st.override ? st.override.timeline : st.timeline);
+  }
+
+  function setMetric(id, v, cls) { const el = $(id); el.textContent = v; el.className = 'v ' + (cls || ''); }
+  const pct = x => Math.round((x || 0) * 100) + '%';
+
+  function drawSpark(tl) {
+    const dpr = window.devicePixelRatio || 1;
+    const w = spark.clientWidth || 300, h = 44;
+    spark.width = w * dpr; spark.height = h * dpr;
+    const ctx = spark.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = '#2a2f3c'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, h - 0.5); ctx.lineTo(w, h - 0.5); ctx.stroke();
+    if (!tl || tl.length < 2) return;
+    const maxT = Math.max(tl[tl.length - 1].t, 1), maxL = Math.max(...tl.map(p => p.len), 1);
+    ctx.strokeStyle = '#5b93d9'; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    tl.forEach((p, i) => {
+      const x = (p.t / maxT) * (w - 2) + 1, y = h - 2 - (p.len / maxL) * (h - 6);
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    });
+    ctx.stroke();
+    // mark vertical jumps (pastes)
+    ctx.fillStyle = '#d9694f';
+    for (let i = 1; i < tl.length; i++) {
+      if (tl[i].len - tl[i - 1].len > Math.max(40, maxL * 0.15)) {
+        const x = (tl[i].t / maxT) * (w - 2) + 1;
+        ctx.fillRect(x - 1, 2, 2, h - 4);
+      }
+    }
+  }
+
+  function provenanceScore(m, trace, flags) {
+    let s = 100;
+    const d1 = -Math.round(60 * m.paste_ratio);
+    trace.push({ signal: 'paste_ratio', value: pct(m.paste_ratio), delta: d1 }); s += d1;
+    if (m.largest_paste_ratio >= 0.6) {
+      const d = -10; s += d;
+      trace.push({ signal: 'largest_single_paste', value: pct(m.largest_paste_ratio), delta: d });
+      flags.push({ code: 'PASTED_BLOCK', severity: m.largest_paste_ratio >= 0.85 ? 'high' : 'medium',
+        message: Math.round(m.largest_paste_ratio * 100) + '% of the resume arrived in a single paste',
+        evidence: { largest_paste_ratio: +m.largest_paste_ratio.toFixed(2), paste_events: m.paste_events } });
+    } else trace.push({ signal: 'largest_single_paste', value: pct(m.largest_paste_ratio), delta: 0 });
+    if (m.rhythm_cv !== null && m.rhythm_cv < 0.25) {
+      const d = -25; s += d;
+      trace.push({ signal: 'rhythm_cv', value: m.rhythm_cv.toFixed(2), delta: d });
+      flags.push({ code: 'UNIFORM_TYPING', severity: 'high', message: 'Inter-key timing is near-uniform (cv ' + m.rhythm_cv.toFixed(2) + ') — automated input pattern', evidence: { rhythm_cv: +m.rhythm_cv.toFixed(2) } });
+    } else trace.push({ signal: 'rhythm_cv', value: m.rhythm_cv === null ? 'n/a' : m.rhythm_cv.toFixed(2), delta: 0 });
+    if (m.typed_chars >= 120 && m.backspace_ratio < 0.01) {
+      const d = -8; s += d;
+      trace.push({ signal: 'backspace_ratio', value: pct(m.backspace_ratio), delta: d });
+    } else trace.push({ signal: 'backspace_ratio', value: pct(m.backspace_ratio), delta: 0 });
+    trace.push({ signal: 'think_pauses', value: String(m.think_pauses), delta: 0 });
+    if (m.typed_chars < 30 && m.pasted_chars > 200) s = Math.min(s, 35);
+    return Math.max(0, Math.min(100, Math.round(s)));
+  }
+
+  // ---------- profile plausibility (local rules on self-reported numbers) ----------
+  function profileScore(input, llm, trace, flags) {
+    const hasLinkedIn = !!input.linkedin_text.trim();
+    if (!hasLinkedIn && input.connections === null) {
+      trace.push({ signal: 'linkedin_provided', value: 'no', delta: -50 });
+      flags.push({ code: 'LINKEDIN_NOT_PROVIDED', severity: 'low', message: 'No LinkedIn data supplied — profile checks skipped', evidence: {} });
+      return 50;
+    }
+    let s = 100;
+    const c = input.connections;
+    if (c !== null) {
+      if (c < 50) { s -= 40; trace.push({ signal: 'connections', value: String(c), delta: -40 }); flags.push({ code: 'THIN_PROFILE', severity: 'high', message: 'Only ' + c + ' connections — thin network for the claimed career', evidence: { connections: c } }); }
+      else if (c < 150) { s -= 15; trace.push({ signal: 'connections', value: String(c), delta: -15 }); flags.push({ code: 'THIN_PROFILE', severity: 'low', message: c + ' connections — lighter than expected', evidence: { connections: c } }); }
+      else trace.push({ signal: 'connections', value: String(c), delta: 0 });
+    }
+    const f = input.followers;
+    if (f !== null && c !== null && f < c * 0.5 && c >= 150) { s -= 5; trace.push({ signal: 'followers', value: String(f), delta: -5 }); }
+    else if (f !== null) trace.push({ signal: 'followers', value: String(f), delta: 0 });
+    const y = input.created_year, thisYear = new Date().getFullYear();
+    if (y !== null) {
+      if (y >= thisYear) { s -= 40; trace.push({ signal: 'profile_age', value: '< 1y', delta: -40 }); flags.push({ code: 'NEW_PROFILE', severity: 'high', message: 'LinkedIn profile created this year — no history behind the claims', evidence: { created_year: y } }); }
+      else if (y === thisYear - 1) { s -= 15; trace.push({ signal: 'profile_age', value: '~1y', delta: -15 }); flags.push({ code: 'NEW_PROFILE', severity: 'medium', message: 'LinkedIn profile is about a year old', evidence: { created_year: y } }); }
+      else trace.push({ signal: 'profile_age', value: (thisYear - y) + 'y', delta: 0 });
+    }
+    const n = llm && Array.isArray(llm.linkedin_positions) ? llm.linkedin_positions.length : null;
+    if (n === 0) { s -= 20; trace.push({ signal: 'linkedin_positions', value: '0', delta: -20 }); }
+    else if (n !== null) trace.push({ signal: 'linkedin_positions', value: String(n), delta: 0 });
+    return Math.max(0, Math.min(100, Math.round(s)));
+  }
+
+  // ---------- claims cross-check (LLM) ----------
+  const SYSTEM_PROMPT = `You are a hiring-fraud consistency checker. You receive a candidate's RESUME, optional COVER LETTER, and the EXPERIENCE section they pasted from their own LinkedIn profile.
+Your job is to find FACTUAL inconsistencies across the three documents as a set. AI-polished wording, formatting, or buzzwords are NOT a problem and must not lower the score. Only contradictions in companies, titles, dates, durations, degrees, or quantified claims count.
+Rules:
+- A title is "inflated" when the resume title is at least one seniority level above the LinkedIn title for the same company and period (e.g. Intern -> Engineer, Engineer -> Senior Staff Engineer, Manager -> Director).
+- A date is a "mismatch" when start or end differ by more than 3 months.
+- Quote exact text as evidence. Never invent positions that are not in the text.
+- claims_score: 100 = everything corroborated; 70-85 = minor date drift only; 40-65 = one inflated title or one missing company; below 40 = multiple contradictions or a fabricated role.
+Return ONLY a JSON object with exactly this shape:
+{"resume_positions":[{"company":"","title":"","start":"","end":""}],
+ "linkedin_positions":[{"company":"","title":"","start":"","end":""}],
+ "matches":[{"company":"","resume_title":"","linkedin_title":"","title_verdict":"match|minor|inflated","date_verdict":"match|mismatch|unknown","note":""}],
+ "contradictions":[{"severity":"low|medium|high","explanation":"","a":{"source":"resume|cover_letter|linkedin","quote":""},"b":{"source":"resume|cover_letter|linkedin","quote":""}}],
+ "resume_only_companies":[],
+ "linkedin_only_companies":[],
+ "claims_score":0,
+ "summary":""}`;
+
+  const PROVIDERS = {
+    openai: { model: 'gpt-4o-mini', label: 'ChatGPT' },
+    anthropic: { model: 'claude-sonnet-5', label: 'Claude' },
+    gemini: { model: 'gemini-2.5-flash', label: 'Gemini' }
+  };
+
+  function userPrompt(input) {
+    return 'RESUME:\n' + input.resume_text + '\n\nCOVER LETTER:\n' + (input.cover_text || '(none)') +
+      '\n\nLINKEDIN EXPERIENCE (self-pasted):\n' + (input.linkedin_text || '(none)') +
+      '\n\nSelf-reported LinkedIn stats: connections=' + input.connections + ', followers=' + input.followers + ', profile_created_year=' + input.created_year;
+  }
+
+  function extractJson(text) {
+    const m = text.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('model returned no JSON');
+    return JSON.parse(m[0]);
+  }
+
+  async function callLLM(provider, model, key, input) {
+    const u = userPrompt(input);
+    let res, text;
+    if (provider === 'openai') {
+      res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+        body: JSON.stringify({ model, temperature: 0, response_format: { type: 'json_object' },
+          messages: [{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content: u }] })
+      });
+      if (!res.ok) throw new Error('OpenAI ' + res.status + ': ' + (await res.text()).slice(0, 200));
+      text = (await res.json()).choices[0].message.content;
+    } else if (provider === 'anthropic') {
+      res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model, max_tokens: 2500, temperature: 0, system: SYSTEM_PROMPT, messages: [{ role: 'user', content: u }] })
+      });
+      if (!res.ok) throw new Error('Anthropic ' + res.status + ': ' + (await res.text()).slice(0, 200));
+      text = (await res.json()).content.map(c => c.text || '').join('');
+    } else if (provider === 'gemini') {
+      res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key), {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: [{ role: 'user', parts: [{ text: u }] }],
+          generationConfig: { temperature: 0, responseMimeType: 'application/json' } })
+      });
+      if (!res.ok) throw new Error('Gemini ' + res.status + ': ' + (await res.text()).slice(0, 200));
+      text = (await res.json()).candidates[0].content.parts.map(p => p.text || '').join('');
+    } else throw new Error('unknown provider');
+    return extractJson(text);
+  }
+
+  function claimsScore(llm, trace, flags) {
+    let s = Math.max(0, Math.min(100, Math.round(Number(llm.claims_score) || 0)));
+    trace.push({ signal: 'llm_claims_score', value: String(s), delta: s - 100 });
+    (llm.matches || []).forEach(m => {
+      if (m.title_verdict === 'inflated') flags.push({ code: 'TITLE_INFLATED', severity: 'high', message: 'Resume says "' + m.resume_title + '" at ' + m.company + '; LinkedIn says "' + m.linkedin_title + '"', evidence: { company: m.company, resume: m.resume_title, linkedin: m.linkedin_title } });
+      if (m.date_verdict === 'mismatch') flags.push({ code: 'DATE_MISMATCH', severity: 'medium', message: 'Dates for ' + m.company + ' differ between resume and LinkedIn' + (m.note ? ' — ' + m.note : ''), evidence: { company: m.company } });
+    });
+    (llm.contradictions || []).forEach(c => flags.push({ code: 'DOC_CONTRADICTION', severity: c.severity || 'medium', message: c.explanation, evidence: { a: c.a, b: c.b } }));
+    (llm.resume_only_companies || []).forEach(co => flags.push({ code: 'COMPANY_NOT_ON_LINKEDIN', severity: 'medium', message: co + ' appears on the resume but not on LinkedIn', evidence: { company: co } }));
+    const hasHigh = (llm.contradictions || []).some(c => c.severity === 'high') || (llm.matches || []).some(m => m.title_verdict === 'inflated');
+    if (hasHigh && s > 60) { trace.push({ signal: 'high_severity_cap', value: 'applied', delta: 60 - s }); s = 60; }
+    return s;
+  }
+
+  // ---------- fixtures ----------
+  const FIXTURES = {
+    honest: {
+      id: 'DEMO-0142', name: 'Hana Ortiz',
+      resume: `Hana Ortiz — Backend Engineer, Brooklyn NY
+
+Northwind Logistics — Software Engineer II (Mar 2022 – Present)
+Own the shipment-tracking API (Go, Postgres). Cut p95 latency from 800ms to 210ms by moving hot reads to a Redis cache. On-call rotation for a team of six.
+
+Brightline Health — Software Engineer (Jul 2019 – Feb 2022)
+Built the patient-intake service in Python/Django. Led the migration from a monolith to three services. Mentored two interns.
+
+Skills: Go, Python, Postgres, Redis, Kubernetes, gRPC, Terraform, observability (OpenTelemetry, Grafana)
+
+B.S. Computer Science, SUNY Binghamton, 2019`,
+      cover: `I've spent the last three years at Northwind running the tracking API that every customer touches, and before that three years at Brightline turning a monolith into services. I'd like to bring that to your platform team.`,
+      linkedin: `Experience
+Software Engineer II
+Northwind Logistics · Full-time
+Mar 2022 – Present · Brooklyn, New York
+Shipment tracking API, Go / Postgres / Redis.
+
+Software Engineer
+Brightline Health · Full-time
+Jul 2019 – Feb 2022 · New York
+Patient intake service, Django. Monolith to services migration.
+
+Education
+SUNY Binghamton — B.S. Computer Science, 2015 – 2019`,
+      conn: 412, followers: 455, created: 2018,
+      pastes: [{ text: 'Skills: Go, Python, Postgres, Redis, Kubernetes, gRPC, Terraform, observability (OpenTelemetry, Grafana)', len: 104 }],
+      metrics: { final_chars: 780, typed_chars: 676, pasted_chars: 104, paste_ratio: 0.13, largest_paste_ratio: 0.13, rhythm_cv: 0.68, hold_cv: 0.41, backspace_ratio: 0.07, think_pauses: 9, session_seconds: 1380, paste_events: 1,
+        timeline: [0,60,120,180,240,300,360,420,480,540,600,660,720,780,840,900,960,1020,1080,1140,1200,1260,1320,1380].map((t, i) => ({ t, len: Math.round(Math.min(780, i * 31 + (i === 17 ? 104 : 0) + (i > 17 ? 104 : 0))) })) },
+      llm: {
+        resume_positions: [{ company: 'Northwind Logistics', title: 'Software Engineer II', start: '2022-03', end: 'present' }, { company: 'Brightline Health', title: 'Software Engineer', start: '2019-07', end: '2022-02' }],
+        linkedin_positions: [{ company: 'Northwind Logistics', title: 'Software Engineer II', start: '2022-03', end: 'present' }, { company: 'Brightline Health', title: 'Software Engineer', start: '2019-07', end: '2022-02' }],
+        matches: [{ company: 'Northwind Logistics', resume_title: 'Software Engineer II', linkedin_title: 'Software Engineer II', title_verdict: 'match', date_verdict: 'match', note: '' }, { company: 'Brightline Health', resume_title: 'Software Engineer', linkedin_title: 'Software Engineer', title_verdict: 'match', date_verdict: 'match', note: '' }],
+        contradictions: [], resume_only_companies: [], linkedin_only_companies: [],
+        claims_score: 94, summary: 'Both positions, titles, dates and degree corroborated across resume, cover letter and LinkedIn.'
+      }
+    },
+    fraud: {
+      id: 'DEMO-0177', name: 'Felix Marlow',
+      resume: `Felix Marlow — Senior Staff Software Engineer
+
+Acme Cloud — Senior Staff Software Engineer (Jan 2021 – Present)
+Architected Acme's multi-region control plane serving 40M requests/day. Led a 14-engineer platform organization. Drove a 60% reduction in infrastructure spend.
+
+Vertex Analytics — Principal Engineer (Feb 2018 – Dec 2020)
+Designed the real-time streaming pipeline (Kafka, Flink) processing 2B events/day. Reported directly to the CTO.
+
+Skills: Kubernetes, Go, Rust, Kafka, Flink, AWS, GCP, distributed systems, team leadership
+
+M.S. Computer Science, Stanford University, 2017`,
+      cover: `With six years leading platform teams at Acme Cloud and Vertex Analytics, I have built the kind of infrastructure your job description calls for and can start immediately.`,
+      linkedin: `Experience
+Software Engineering Intern
+Acme Cloud · Internship
+Jun 2026 – Present · Remote
+Working on internal dashboards.
+
+Education
+Stanford University — M.S. Computer Science, 2017`,
+      conn: 12, followers: 9, created: 2026,
+      pastes: [],   // filled at load: the whole resume as one paste
+      metrics: { final_chars: 720, typed_chars: 14, pasted_chars: 706, paste_ratio: 0.98, largest_paste_ratio: 0.98, rhythm_cv: null, hold_cv: null, backspace_ratio: 0, think_pauses: 0, session_seconds: 41, paste_events: 1,
+        timeline: [{ t: 0, len: 0 }, { t: 6, len: 4 }, { t: 12, len: 9 }, { t: 14, len: 14 }, { t: 15, len: 720 }, { t: 41, len: 720 }] },
+      llm: {
+        resume_positions: [{ company: 'Acme Cloud', title: 'Senior Staff Software Engineer', start: '2021-01', end: 'present' }, { company: 'Vertex Analytics', title: 'Principal Engineer', start: '2018-02', end: '2020-12' }],
+        linkedin_positions: [{ company: 'Acme Cloud', title: 'Software Engineering Intern', start: '2026-06', end: 'present' }],
+        matches: [{ company: 'Acme Cloud', resume_title: 'Senior Staff Software Engineer', linkedin_title: 'Software Engineering Intern', title_verdict: 'inflated', date_verdict: 'mismatch', note: 'resume Jan 2021 vs LinkedIn Jun 2026' }],
+        contradictions: [
+          { severity: 'high', explanation: 'Cover letter claims six years leading platform teams; LinkedIn shows a three-month internship', a: { source: 'cover_letter', quote: 'six years leading platform teams at Acme Cloud and Vertex Analytics' }, b: { source: 'linkedin', quote: 'Software Engineering Intern · Jun 2026 – Present' } },
+          { severity: 'high', explanation: 'Resume claims leading a 14-engineer organization at Acme; LinkedIn role is an internship on internal dashboards', a: { source: 'resume', quote: 'Led a 14-engineer platform organization' }, b: { source: 'linkedin', quote: 'Working on internal dashboards.' } }
+        ],
+        resume_only_companies: ['Vertex Analytics'], linkedin_only_companies: [],
+        claims_score: 18, summary: 'One inflated title, one date mismatch, one company absent from LinkedIn, and two high-severity contradictions between cover letter and profile.'
+      }
+    }
+  };
+
+  let activeFixture = null;
+
+  function loadFixture(key) {
+    const f = FIXTURES[key];
+    activeFixture = key;
+    $('candId').value = f.id;
+    resumeEl.value = f.resume; coverEl.value = f.cover; linkedinEl.value = f.linkedin;
+    connEl.value = f.conn; followersEl.value = f.followers; createdEl.value = f.created;
+    const st = trackers.resume;
+    st.pastes = key === 'fraud' ? [{ text: f.resume, len: f.resume.length, t: 0 }] : f.pastes.slice();
+    st.typedChars = f.metrics.typed_chars; st.pastedChars = f.metrics.pasted_chars;
+    st.override = f.metrics;
+    $('resumeMeta').innerHTML = 'typed <b>' + st.typedChars + '</b> · pasted <b>' + st.pastedChars + '</b>';
+    renderProvenance();
+    clearResult();
+    log('Loaded fixture ' + f.id + ' (' + f.name + ') — ' + (key === 'fraud' ? 'resume pasted as one block' : 'resume built incrementally over 23 min'), 'info');
+  }
+
+  // ---------- run ----------
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  function readInput() {
+    const num = el => el.value.trim() === '' ? null : Number(el.value);
+    return {
+      candidate_id: $('candId').value.trim() || 'UNKNOWN',
+      resume_text: resumeEl.value, cover_text: coverEl.value, linkedin_text: linkedinEl.value,
+      connections: num(connEl), followers: num(followersEl), created_year: num(createdEl)
+    };
+  }
+
+  async function run() {
+    const input = readInput();
+    if (!input.resume_text.trim()) { log('Resume is empty — nothing to check.', 'warn'); return; }
+    runBtn.disabled = true;
+    clearResult();
+    const trace = [], flags = [];
+    const result = { candidate_id: input.candidate_id, status: 'running' };
+
+    try {
+      // 1. provenance
+      setStage(1, 'active');
+      log('Provenance: reading typing timeline for the resume box…');
+      await sleep(350);
+      const m = metricsOf(trackers.resume, resumeEl);
+      const prov = provenanceScore(m, trace, flags);
+      $('s-prov').textContent = prov;
+      log('Provenance score ' + prov + ' — paste ratio ' + pct(m.paste_ratio) + ', rhythm cv ' + (m.rhythm_cv === null ? 'n/a' : m.rhythm_cv.toFixed(2)), prov >= 60 ? 'pass' : 'warn');
+      setStage(1, 'done');
+
+      // 2. claims
+      setStage(2, 'active');
+      const provider = providerEl.value;
+      let llm;
+      if (provider === 'demo') {
+        if (!activeFixture || resumeEl.value !== FIXTURES[activeFixture].resume) {
+          throw new Error('Demo mode only knows the two fixture candidates. Pick a provider and paste a key to check custom text.');
+        }
+        log('Claims: demo mode — replaying pre-computed cross-check for ' + FIXTURES[activeFixture].id + '…');
+        await sleep(900);
+        llm = FIXTURES[activeFixture].llm;
+      } else {
+        const key = apikeyEl.value.trim(), model = modelEl.value.trim() || PROVIDERS[provider].model;
+        if (!key) throw new Error('No API key for ' + PROVIDERS[provider].label + '.');
+        log('Claims: sending resume + cover letter + LinkedIn to ' + PROVIDERS[provider].label + ' (' + model + ')…');
+        const t0 = performance.now();
+        llm = await callLLM(provider, model, key, input);
+        log('Claims: model replied in ' + Math.round(performance.now() - t0) + ' ms', 'info');
+      }
+      const claims = claimsScore(llm, trace, flags);
+      $('s-claims').textContent = claims;
+      log('Claims score ' + claims + ' — ' + (llm.summary || ''), claims >= 60 ? 'pass' : 'warn');
+      setStage(2, 'done');
+
+      // 3. profile
+      setStage(3, 'active');
+      await sleep(350);
+      const prof = profileScore(input, llm, trace, flags);
+      $('s-profile').textContent = prof;
+      log('Profile plausibility ' + prof, prof >= 60 ? 'pass' : 'warn');
+      setStage(3, 'done');
+
+      // 4. combine
+      setStage(4, 'active');
+      await sleep(300);
+      const total = Math.round(WEIGHTS.provenance * prov + WEIGHTS.claims * claims + WEIGHTS.profile * prof);
+      const status = total >= GATE ? 'cleared' : 'flagged';
+      Object.assign(result, {
+        stage2_consistency_score: total,
+        status,
+        stage_cleared: total >= GATE,
+        breakdown: {
+          provenance: { score: prov, weight: WEIGHTS.provenance, signals: stripTimeline(m) },
+          claims: { score: claims, weight: WEIGHTS.claims, positions_matched: (llm.matches || []).filter(x => x.title_verdict !== 'inflated' && x.date_verdict !== 'mismatch').length, positions_total: (llm.resume_positions || []).length, summary: llm.summary || '' },
+          profile: { score: prof, weight: WEIGHTS.profile, signals: { connections: input.connections, followers: input.followers, created_year: input.created_year } }
+        },
+        stage2_flags: flags,
+        trace,
+        model: provider === 'demo' ? 'demo-fixture' : (modelEl.value.trim() || PROVIDERS[provider].model),
+        computed_at: new Date().toISOString()
+      });
+      renderResult(result);
+      log('Stage 2 complete — Consistency Score: ' + total + ' (' + status + ')', status === 'cleared' ? 'pass' : 'warn');
+      setStage(4, 'done');
+      try { localStorage.setItem('trustfunnel.stage2.' + input.candidate_id, JSON.stringify(result)); } catch (e) {}
+      window.TrustFunnelStage2 = result;
+    } catch (err) {
+      log('Error: ' + err.message, 'warn');
+      result.status = 'error'; result.error = err.message;
+      jsonOut.textContent = JSON.stringify(result, null, 2);
+      dots.forEach(d => d.classList.remove('active'));
+    } finally {
+      runBtn.disabled = false;
+    }
+  }
+
+  function stripTimeline(m) { const c = Object.assign({}, m); delete c.timeline; c.rhythm_cv = c.rhythm_cv === null ? null : +c.rhythm_cv.toFixed(2); c.hold_cv = c.hold_cv === null ? null : +c.hold_cv.toFixed(2); c.paste_ratio = +c.paste_ratio.toFixed(2); c.largest_paste_ratio = +c.largest_paste_ratio.toFixed(2); c.backspace_ratio = +c.backspace_ratio.toFixed(2); return c; }
+
+  function renderResult(r) {
+    bigScore.classList.remove('unset');
+    bigNum.textContent = r.stage2_consistency_score;
+    bigStatus.textContent = r.status; bigStatus.className = 'status ' + r.status;
+    bigScore.style.color = r.status === 'cleared' ? '' : 'var(--red)';
+    flagsEl.innerHTML = '';
+    if (!r.stage2_flags.length) flagsEl.innerHTML = '<div class="flag-empty">No flags — resume, cover letter and LinkedIn agree.</div>';
+    r.stage2_flags.forEach(f => {
+      const d = document.createElement('div');
+      d.className = 'flag ' + f.severity;
+      const ev = f.evidence && (f.evidence.a || f.evidence.b) ? ('“' + (f.evidence.a.quote || '') + '” vs “' + (f.evidence.b.quote || '') + '”') : '';
+      d.innerHTML = '<i></i><div><code>' + f.code + '</code><span></span>' + (ev ? '<div class="ev"></div>' : '') + '</div>';
+      d.querySelector('span').textContent = f.message;
+      if (ev) d.querySelector('.ev').textContent = ev;
+      flagsEl.appendChild(d);
+    });
+    traceEl.innerHTML = '';
+    r.trace.forEach(t => {
+      const d = document.createElement('div');
+      d.className = 'tr';
+      const cls = t.delta > 0 ? 'plus' : t.delta === 0 ? 'zero' : '';
+      d.innerHTML = '<span class="s"></span><span></span><span class="d ' + cls + '">' + (t.delta > 0 ? '+' : '') + t.delta + '</span>';
+      d.children[0].textContent = t.signal; d.children[1].textContent = t.value;
+      traceEl.appendChild(d);
+    });
+    jsonOut.textContent = JSON.stringify(r, null, 2);
+  }
+
+  function clearResult() {
+    ['s-prov', 's-claims', 's-profile'].forEach(id => $(id).textContent = '—');
+    bigScore.classList.add('unset'); bigScore.style.color = '';
+    bigNum.textContent = '—'; bigStatus.textContent = 'not_started'; bigStatus.className = 'status';
+    flagsEl.innerHTML = '<div class="flag-empty">None yet.</div>';
+    traceEl.innerHTML = '<div class="flag-empty">Run the check to see the math.</div>';
+    jsonOut.textContent = '{ "status": "not_started" }';
+    dots.forEach(d => d.classList.remove('active', 'done'));
+    labels.forEach((l, i) => l.classList.toggle('current', i === 0));
+  }
+
+  function setStage(n, state) {
+    dots.forEach(d => d.classList.remove('active'));
+    labels.forEach(l => l.classList.remove('current'));
+    if (state === 'active') { dots[n - 1].classList.add('active'); labels[n - 1].classList.add('current'); }
+    if (state === 'done') { dots[n - 1].classList.add('done'); if (n < 4) labels[n].classList.add('current'); }
+  }
+
+  function log(msg, kind) {
+    kind = kind || 'info';
+    const t = new Date();
+    const ts = String(t.getMinutes()).padStart(2, '0') + ':' + String(t.getSeconds()).padStart(2, '0');
+    const row = document.createElement('div');
+    row.className = 'row ' + kind;
+    row.innerHTML = '<span class="t">' + ts + '</span><span class="m"></span>';
+    row.querySelector('.m').textContent = msg;
+    logFeed.appendChild(row);
+    logFeed.scrollTop = logFeed.scrollHeight;
+  }
+
+  // ---------- provider / key handling ----------
+  function syncProvider() {
+    const p = providerEl.value;
+    const isDemo = p === 'demo';
+    modelEl.disabled = isDemo; apikeyEl.disabled = isDemo;
+    if (!isDemo) {
+      modelEl.value = sessionStorage.getItem('tf.stage2.model.' + p) || PROVIDERS[p].model;
+      apikeyEl.value = sessionStorage.getItem('tf.stage2.key.' + p) || '';
+      llmNote.innerHTML = 'Calls <code>' + PROVIDERS[p].label + '</code> directly from this browser with your key. The key is kept in <code>sessionStorage</code> for this tab only and is never written to the repo or any server of ours.';
+    } else {
+      modelEl.value = ''; apikeyEl.value = '';
+      llmNote.innerHTML = 'Demo mode replays a pre-computed cross-check for the two fixture candidates. Pick a provider and paste a key to run the real thing on any text. Keys live in <code>sessionStorage</code> and never leave this browser except to the provider you chose.';
+    }
+  }
+  providerEl.addEventListener('change', syncProvider);
+  apikeyEl.addEventListener('input', () => { if (providerEl.value !== 'demo') sessionStorage.setItem('tf.stage2.key.' + providerEl.value, apikeyEl.value); });
+  modelEl.addEventListener('input', () => { if (providerEl.value !== 'demo') sessionStorage.setItem('tf.stage2.model.' + providerEl.value, modelEl.value); });
+
+  // ---------- wiring ----------
+  runBtn.addEventListener('click', run);
+  $('demoHonestBtn').addEventListener('click', () => loadFixture('honest'));
+  $('demoFraudBtn').addEventListener('click', () => loadFixture('fraud'));
+  resetBtn.addEventListener('click', () => {
+    activeFixture = null;
+    [resumeEl, coverEl, linkedinEl, connEl, followersEl, createdEl].forEach(el => el.value = '');
+    const fresh = makeTracker(resumeEl, $('resumeMeta'));
+    Object.assign(trackers.resume, { typedChars: 0, pastedChars: 0, backspaces: 0, pastes: [], ikis: [], holds: [], pauses: 0, lastKeyT: null, startT: null, timeline: [], override: null });
+    void fresh;
+    $('resumeMeta').innerHTML = 'typed <b>0</b> · pasted <b>0</b>';
+    $('coverMeta').innerHTML = 'typed <b>0</b> · pasted <b>0</b>';
+    renderProvenance();
+    clearResult();
+    logFeed.innerHTML = '';
+    log('Reset. Waiting for input…');
+  });
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(jsonOut.textContent).then(() => { copyBtn.textContent = 'Copied'; setTimeout(() => copyBtn.textContent = 'Copy JSON', 1200); });
+  });
+  exportBtn.addEventListener('click', () => {
+    if (!window.TrustFunnelStage2) { log('Nothing to save yet — run the check first.', 'warn'); return; }
+    try {
+      localStorage.setItem('trustfunnel.stage2.' + window.TrustFunnelStage2.candidate_id, JSON.stringify(window.TrustFunnelStage2));
+      log('Saved to localStorage["trustfunnel.stage2.' + window.TrustFunnelStage2.candidate_id + '"]', 'pass');
+    } catch (e) { log('localStorage unavailable: ' + e.message, 'warn'); }
+  });
+  window.addEventListener('resize', () => renderProvenance());
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') run();
+  });
+
+  syncProvider();
+  renderProvenance();
+})();
+</script>
+</body>
+</html>
