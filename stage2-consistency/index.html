@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Stage 2 — Resume &amp; Profile Consistency</title>
+<title>Stage 2 — Consistency Check</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e" crossorigin="anonymous"></script>
 <style>
   :root {
     --bg: #10131a;
@@ -24,7 +25,7 @@
   }
   * { box-sizing: border-box; }
   html, body {
-    height: 100%;
+    min-height: 100%;
     margin: 0;
     background: var(--bg);
     color: var(--text);
@@ -36,587 +37,626 @@
   .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
 
   header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    padding: 20px 28px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 16px 28px;
     border-bottom: 1px solid var(--hairline);
-    flex-wrap: wrap;
-    gap: 8px;
   }
-  header h1 { font-size: 17px; font-weight: 700; letter-spacing: 0.01em; }
-  header .sub { color: var(--text-dim); font-size: 13px; }
+  header h1 { font-size: 15px; font-weight: 700; letter-spacing: 0.01em; }
   header .badge {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--gold);
-    border: 1px solid var(--gold);
-    border-radius: var(--radius);
-    padding: 3px 8px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold);
+    border: 1px solid var(--gold); border-radius: var(--radius); padding: 3px 8px;
     display: flex; align-items: center; gap: 6px;
   }
-  header .badge input {
-    background: transparent; border: none; color: var(--gold);
-    font-family: inherit; font-size: inherit; width: 96px; padding: 0; outline: none;
-  }
+  header .badge input { background: transparent; border: none; color: var(--gold); font-family: inherit; font-size: inherit; width: 92px; padding: 0; outline: none; }
 
-  main {
-    display: grid;
-    grid-template-columns: 1.05fr 1fr;
-    gap: 1px;
-    background: var(--hairline);
-    min-height: calc(100vh - 74px);
-  }
-  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
-
-  .input-col, .log-col { background: var(--bg); padding: 24px 28px; min-width: 0; }
-
-  .stage-rail { display: flex; gap: 6px; margin-bottom: 18px; }
-  .stage-rail .dot { flex: 1; height: 3px; background: var(--hairline); border-radius: 2px; position: relative; overflow: hidden; }
-  .stage-rail .dot.done { background: var(--gold); }
-  .stage-rail .dot.active::after { content: ''; position: absolute; inset: 0; background: var(--blue); animation: pulse 1.4s ease-in-out infinite; }
+  /* progress */
+  .progress { display: flex; align-items: center; gap: 14px; flex: 1; max-width: 520px; margin: 0 24px; }
+  .progress .lvl { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); white-space: nowrap; }
+  .progress .lvl b { color: var(--text); font-weight: 500; }
+  .progress .segs { display: flex; gap: 6px; flex: 1; }
+  .progress .seg { flex: 1; height: 4px; background: var(--hairline); border-radius: 2px; position: relative; overflow: hidden; }
+  .progress .seg.done { background: var(--gold); }
+  .progress .seg.active::after { content: ''; position: absolute; inset: 0; background: var(--blue); animation: pulse 1.4s ease-in-out infinite; }
   @keyframes pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
-  @media (prefers-reduced-motion: reduce) { .stage-rail .dot.active::after { animation: none; opacity: 1; } }
 
-  .stage-labels {
-    display: flex; justify-content: space-between;
-    font-size: 11px; color: var(--text-dim); margin-bottom: 24px;
-    font-family: 'IBM Plex Mono', monospace;
+  main { max-width: 760px; margin: 0 auto; padding: 36px 20px 60px; }
+  .screen { display: none; }
+  .screen.on { display: block; animation: rise 0.28s ease-out; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .screen.on { animation: none; }
+    .progress .seg.active::after { animation: none; opacity: 1; }
   }
-  .stage-labels { gap: 10px; }
-  .stage-labels span { flex: 1; text-align: center; }
-  .stage-labels span:first-child { text-align: left; }
-  .stage-labels span:last-child { text-align: right; }
-  .stage-labels span.current { color: var(--text); }
 
-  .field { margin-bottom: 16px; }
-  .field-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
-  .field label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.03em; }
-  .field .meta { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); }
-  .field .meta b { color: var(--text); font-weight: 500; }
-  textarea, input[type=text], input[type=number], input[type=password], select {
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .screen h2 { font-size: 26px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+  .lead { color: var(--text-dim); font-size: 14px; line-height: 1.55; margin-bottom: 24px; max-width: 560px; }
+
+  .card { background: var(--panel); border: 1px solid var(--hairline); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+  .card h3 { font-size: 13px; margin-bottom: 10px; }
+
+  /* intro level list */
+  .levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+  @media (max-width: 620px) { .levels { grid-template-columns: 1fr; } }
+  .level { background: var(--panel); border: 1px solid var(--hairline); border-radius: 8px; padding: 18px; }
+  .level .n { font-family: 'Archivo', sans-serif; font-size: 28px; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 10px; }
+  .level .t { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .level .d { color: var(--text-dim); font-size: 12.5px; line-height: 1.5; }
+
+  textarea, input[type=text], input[type=number], input[type=password] {
     width: 100%;
-    background: var(--panel);
+    background: var(--panel-2);
     border: 1px solid var(--hairline);
-    border-radius: var(--radius);
+    border-radius: 6px;
     color: var(--text);
     font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 13px;
-    line-height: 1.55;
-    padding: 10px 12px;
+    font-size: 14px; line-height: 1.55;
+    padding: 12px 14px;
     outline: none;
     transition: border-color 0.15s ease;
   }
-  textarea:focus, input:focus, select:focus { border-color: var(--blue); }
-  textarea { resize: vertical; min-height: 120px; }
-  textarea#resume { min-height: 170px; }
-  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  textarea:focus, input:focus { border-color: var(--blue); }
+  textarea { resize: vertical; min-height: 200px; }
+  label.lbl { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.03em; margin-bottom: 6px; }
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
   @media (max-width: 520px) { .row-3 { grid-template-columns: 1fr; } }
 
-  .llm-box {
-    border: 1px solid var(--hairline); border-radius: 6px; padding: 14px 16px; background: var(--panel);
-    margin-bottom: 16px;
-  }
-  .llm-box .title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 0.04em; margin-bottom: 10px; }
-  .llm-grid { display: grid; grid-template-columns: 130px 1fr 1fr; gap: 10px; }
-  @media (max-width: 620px) { .llm-grid { grid-template-columns: 1fr; } }
-  .llm-box .note { font-size: 11.5px; color: var(--text-dim); margin-top: 8px; line-height: 1.5; }
-  .llm-box .note code { font-family: 'IBM Plex Mono', monospace; color: var(--text); }
+  details { border: 1px solid var(--hairline); border-radius: 8px; background: var(--panel); margin-bottom: 16px; }
+  details summary { cursor: pointer; padding: 12px 16px; font-size: 13px; font-weight: 500; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after { content: '+'; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); }
+  details[open] summary::after { content: '−'; }
+  details .body { padding: 0 16px 16px; }
 
-  .actions { margin-top: 4px; display: flex; gap: 10px; flex-wrap: wrap; }
-  button {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 13px; font-weight: 500;
-    padding: 10px 16px;
-    border-radius: var(--radius);
-    border: 1px solid var(--hairline);
-    background: var(--panel-2);
-    color: var(--text);
-    cursor: pointer;
-    transition: border-color 0.15s ease, background 0.15s ease;
-  }
-  button:hover:not(:disabled) { border-color: var(--gold); }
-  button:disabled { opacity: 0.35; cursor: not-allowed; }
-  button.primary { background: var(--gold); color: #17140b; border-color: var(--gold); font-weight: 600; }
-  button.primary:hover:not(:disabled) { background: #d6ae55; }
-
-  .log-col { display: flex; flex-direction: column; gap: 16px; }
-  .log-col h2 { font-size: 14px; margin-bottom: 4px; }
-  .log-col .hint { font-size: 12px; color: var(--text-dim); }
-
-  .panel { background: var(--panel); border: 1px solid var(--hairline); border-radius: 6px; padding: 16px; }
-  .panel .label { font-size: 12px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace; }
-
-  /* provenance heatmap */
-  .heat-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  /* provenance */
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  .chip { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); border: 1px solid var(--hairline); border-radius: 999px; padding: 5px 10px; }
+  .chip b { color: var(--text); font-weight: 500; }
+  .chip.bad b { color: var(--red); }
+  .chip.ok b { color: var(--green); }
   .legend { display: flex; gap: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--text-dim); }
   .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
-  .heatmap { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+  .heatmap { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
   .heat-block {
-    border-left: 3px solid var(--green);
-    background: var(--panel-2);
-    padding: 7px 10px;
-    font-size: 12px; line-height: 1.45;
-    color: var(--text);
+    border-left: 3px solid var(--green); background: var(--panel-2);
+    padding: 7px 10px; font-size: 12.5px; line-height: 1.45;
     display: flex; gap: 10px; justify-content: space-between; align-items: flex-start;
     border-radius: 0 var(--radius) var(--radius) 0;
   }
   .heat-block .txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .heat-block .tag { font-family: 'IBM Plex Mono', monospace; font-size: 10px; flex-shrink: 0; color: var(--green); }
-  .heat-block.pasted { border-left-color: var(--red); }
-  .heat-block.pasted .tag { color: var(--red); }
-  .heat-block.mixed { border-left-color: var(--gold); }
-  .heat-block.mixed .tag { color: var(--gold); }
-  .heat-empty { font-size: 12px; color: var(--text-dim); padding: 8px 0; }
+  .heat-block.pasted { border-left-color: var(--red); } .heat-block.pasted .tag { color: var(--red); }
+  .heat-block.mixed { border-left-color: var(--gold); } .heat-block.mixed .tag { color: var(--gold); }
+  .heat-empty { font-size: 12.5px; color: var(--text-dim); padding: 6px 0; }
+  canvas#spark { width: 100%; height: 40px; display: block; margin-top: 10px; }
 
-  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
-  @media (max-width: 520px) { .metrics { grid-template-columns: 1fr 1fr; } }
-  .metric { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 8px 10px; }
-  .metric .n { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-dim); }
-  .metric .v { font-family: 'Archivo', sans-serif; font-size: 17px; font-weight: 600; margin-top: 1px; }
-  .metric .v.bad { color: var(--red); }
-  .metric .v.ok { color: var(--green); }
-  canvas#spark { width: 100%; height: 44px; display: block; margin-top: 12px; }
-
-  .log-feed {
-    background: var(--panel);
-    border: 1px solid var(--hairline);
-    border-radius: 6px;
-    padding: 14px 16px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px; line-height: 1.9;
-    overflow-y: auto; max-height: 210px;
+  /* dropzone */
+  .drop { display: block;
+    border: 1.5px dashed var(--hairline); border-radius: 8px; padding: 28px 20px; text-align: center;
+    background: var(--panel-2); cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease;
   }
-  .log-feed .row { display: flex; gap: 10px; color: var(--text-dim); }
-  .log-feed .row .t { flex-shrink: 0; opacity: 0.6; }
-  .log-feed .row.pass .m { color: var(--green); }
-  .log-feed .row.warn .m { color: var(--red); }
-  .log-feed .row.info .m { color: var(--text); }
+  .drop:hover, .drop.over { border-color: var(--gold); background: #22273a; }
+  .drop .big { font-family: 'Archivo', sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .drop .small { color: var(--text-dim); font-size: 12.5px; }
+  .drop input { display: none; }
+  .drop.done { border-style: solid; border-color: var(--green); }
+  .drop.done .big { color: var(--green); }
 
-  .score-card .big-score {
-    font-family: 'Archivo', sans-serif;
-    font-size: 44px; font-weight: 700;
-    margin: 4px 0 14px; color: var(--gold);
-    display: flex; align-items: baseline; gap: 12px;
+  /* tutorial */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 620px) { .steps { grid-template-columns: 1fr; } }
+  .step .fig { background: #0c0e13; border: 1px solid var(--hairline); border-radius: 6px; overflow: hidden; }
+  .step .fig svg { display: block; width: 100%; height: auto; }
+  .step .cap { font-size: 12.5px; line-height: 1.5; margin-top: 8px; color: var(--text-dim); }
+  .step .cap b { color: var(--text); font-weight: 600; }
+
+  /* model picker */
+  .models { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  @media (max-width: 620px) { .models { grid-template-columns: 1fr 1fr; } }
+  .model {
+    border: 1px solid var(--hairline); border-radius: 8px; padding: 14px 12px; background: var(--panel-2); cursor: pointer; text-align: left;
+    font-family: 'IBM Plex Sans', sans-serif; color: var(--text); transition: border-color 0.15s ease;
   }
-  .score-card .big-score.unset { color: var(--text-dim); }
-  .score-card .big-score .status { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.06em; padding: 3px 8px; border-radius: var(--radius); border: 1px solid var(--hairline); color: var(--text-dim); }
-  .score-card .big-score .status.cleared { color: var(--green); border-color: var(--green); }
-  .score-card .big-score .status.flagged { color: var(--red); border-color: var(--red); }
-  .sub-scores { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  @media (max-width: 520px) { .sub-scores { grid-template-columns: 1fr; } }
-  .sub-score { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 10px 12px; }
-  .sub-score .n { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); }
-  .sub-score .v { font-family: 'Archivo', sans-serif; font-size: 20px; font-weight: 600; margin-top: 2px; }
-  .sub-score .w { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-dim); }
+  .model:hover { border-color: var(--gold); }
+  .model.sel { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
+  .model .t { font-weight: 600; font-size: 13px; }
+  .model .d { color: var(--text-dim); font-size: 11.5px; margin-top: 2px; }
+  .keyrow { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-bottom: 10px; }
+  @media (max-width: 520px) { .keyrow { grid-template-columns: 1fr; } }
+  .note { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+  .note code { font-family: 'IBM Plex Mono', monospace; color: var(--text); }
 
-  .flags { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-  .flag { display: grid; grid-template-columns: 8px 1fr; gap: 10px; align-items: start; font-size: 12px; line-height: 1.45; padding: 7px 10px; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--panel-2); }
-  .flag i { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; background: var(--text-dim); }
-  .flag.high i { background: var(--red); }
-  .flag.medium i { background: var(--gold); }
-  .flag.low i { background: var(--blue); }
+  /* checklist while running */
+  .tasks { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+  .task { display: grid; grid-template-columns: 22px 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; border: 1px solid var(--hairline); border-radius: 6px; background: var(--panel-2); font-size: 13.5px; color: var(--text-dim); }
+  .task .ic { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--hairline); }
+  .task.run { color: var(--text); } .task.run .ic { border-color: var(--blue); border-top-color: transparent; animation: spin 0.8s linear infinite; }
+  .task.ok { color: var(--text); } .task.ok .ic { border-color: var(--green); background: var(--green); }
+  .task.bad { color: var(--text); } .task.bad .ic { border-color: var(--red); background: var(--red); }
+  .task .v { font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 15px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .task.run .ic { animation: none; border-top-color: var(--blue); } }
+
+  /* result */
+  .score-hero { text-align: center; padding: 28px 20px 24px; }
+  .score-hero .num { font-family: 'Archivo', sans-serif; font-size: 96px; font-weight: 700; line-height: 1; color: var(--gold); letter-spacing: -0.02em; }
+  .score-hero .num.low { color: var(--red); }
+  .score-hero .status { display: inline-block; margin-top: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.1em; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--hairline); color: var(--text-dim); }
+  .score-hero .status.cleared { color: var(--green); border-color: var(--green); }
+  .score-hero .status.flagged { color: var(--red); border-color: var(--red); }
+  .score-hero .sub { color: var(--text-dim); font-size: 13px; margin-top: 10px; }
+  .bars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 620px) { .bars { grid-template-columns: 1fr; } }
+  .bar { background: var(--panel); border: 1px solid var(--hairline); border-radius: 8px; padding: 14px; }
+  .bar .n { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); display: flex; justify-content: space-between; }
+  .bar .v { font-family: 'Archivo', sans-serif; font-size: 24px; font-weight: 700; margin: 4px 0 8px; }
+  .bar .track { height: 6px; background: var(--hairline); border-radius: 3px; overflow: hidden; }
+  .bar .fill { height: 100%; width: 0; background: var(--gold); border-radius: 3px; transition: width 0.7s ease-out; }
+  .bar .fill.low { background: var(--red); }
+  .flags { display: flex; flex-direction: column; gap: 8px; }
+  .flag { display: grid; grid-template-columns: 8px 1fr; gap: 12px; align-items: start; font-size: 13px; line-height: 1.5; padding: 10px 14px; border: 1px solid var(--hairline); border-radius: 6px; background: var(--panel-2); }
+  .flag i { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; background: var(--text-dim); }
+  .flag.high i { background: var(--red); } .flag.medium i { background: var(--gold); } .flag.low i { background: var(--blue); }
   .flag code { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--text-dim); margin-right: 6px; }
-  .flag .ev { color: var(--text-dim); font-size: 11.5px; margin-top: 2px; }
-  .flag-empty { font-size: 12px; color: var(--text-dim); }
-
-  .json-box {
-    background: #0c0e13;
-    border: 1px solid var(--hairline);
-    border-radius: var(--radius);
-    padding: 12px 14px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11.5px; line-height: 1.6;
-    color: #a9b3c9;
-    white-space: pre-wrap; word-break: break-word;
-    max-height: 200px; overflow-y: auto;
-  }
-  .copy-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
-  .copy-row button { font-size: 12px; padding: 6px 12px; }
-
-  .trace { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; line-height: 1.8; color: var(--text-dim); max-height: 160px; overflow-y: auto; }
+  .flag .ev { color: var(--text-dim); font-size: 12px; margin-top: 3px; }
+  .flag-empty { font-size: 13px; color: var(--green); }
+  .trace { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; line-height: 1.9; color: var(--text-dim); }
   .trace .tr { display: grid; grid-template-columns: 1fr auto auto; gap: 14px; }
-  .trace .tr .d { color: var(--red); }
-  .trace .tr .d.plus { color: var(--green); }
-  .trace .tr .d.zero { color: var(--text-dim); }
-  .trace .tr .s { color: var(--text); }
-
-  footer {
-    padding: 14px 28px;
-    border-top: 1px solid var(--hairline);
-    font-size: 11px; color: var(--text-dim);
-    font-family: 'IBM Plex Mono', monospace;
-    line-height: 1.6;
+  .trace .tr .d { color: var(--red); } .trace .tr .d.zero { color: var(--text-dim); } .trace .tr .s { color: var(--text); }
+  .json-box {
+    background: #0c0e13; border: 1px solid var(--hairline); border-radius: var(--radius);
+    padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; line-height: 1.6;
+    color: #a9b3c9; white-space: pre-wrap; word-break: break-word; max-height: 220px; overflow-y: auto;
   }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+  .actions .spacer { flex: 1; }
+  button {
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 500;
+    padding: 12px 20px; border-radius: 6px;
+    border: 1px solid var(--hairline); background: var(--panel-2); color: var(--text);
+    cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  button:hover:not(:disabled) { border-color: var(--gold); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+  button.primary { background: var(--gold); color: #17140b; border-color: var(--gold); font-weight: 600; }
+  button.primary:hover:not(:disabled) { background: #d6ae55; }
+  button.ghost { background: transparent; }
+  button.sm { font-size: 12px; padding: 7px 12px; }
+  .msg { font-size: 12.5px; color: var(--red); min-height: 18px; margin-top: 8px; }
+
+  footer { max-width: 760px; margin: 0 auto; padding: 14px 20px 30px; font-size: 11px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace; line-height: 1.6; border-top: 1px solid var(--hairline); }
 </style>
 </head>
 <body>
 
 <header>
-  <div>
-    <h1>TrustFunnel — Stage 2</h1>
-    <div class="sub">Resume &amp; Profile Consistency module</div>
+  <h1>TrustFunnel · Stage 2</h1>
+  <div class="progress" id="progress">
+    <span class="lvl" id="lvlText"><b>Ready</b></span>
+    <div class="segs"><div class="seg" id="seg-1"></div><div class="seg" id="seg-2"></div><div class="seg" id="seg-3"></div></div>
   </div>
-  <div class="badge">CANDIDATE_ID: <input id="candId" value="DEMO-0142" spellcheck="false" aria-label="Candidate ID"></div>
+  <div class="badge">ID <input id="candId" value="DEMO-0142" spellcheck="false" aria-label="Candidate ID"></div>
 </header>
 
 <main>
-  <section class="input-col">
-    <div class="stage-rail">
-      <div class="dot" id="dot-1"></div>
-      <div class="dot" id="dot-2"></div>
-      <div class="dot" id="dot-3"></div>
-      <div class="dot" id="dot-4"></div>
-    </div>
-    <div class="stage-labels">
-      <span id="lbl-1" class="current">Provenance</span>
-      <span id="lbl-2">Claim cross-check</span>
-      <span id="lbl-3">Profile plausibility</span>
-      <span id="lbl-4">Consistency score</span>
-    </div>
 
-    <div class="field">
-      <div class="field-head">
-        <label for="resume">RESUME — type or paste; provenance is recorded live</label>
-        <span class="meta" id="resumeMeta">typed <b>0</b> · pasted <b>0</b></span>
+  <!-- INTRO -->
+  <section class="screen on" data-screen="intro">
+    <div class="kicker">Consistency check</div>
+    <h2>Three levels. One honest score.</h2>
+    <p class="lead">Prove your application is yours and that it agrees with itself. Nothing here punishes AI polish: only pasted-in blocks, contradictions between documents, and brand-new profiles move the number.</p>
+    <div class="levels">
+      <div class="level"><div class="n">1</div><div class="t">Resume</div><div class="d">Type or paste. We watch rhythm, not keys.</div></div>
+      <div class="level"><div class="n">2</div><div class="t">LinkedIn</div><div class="d">Upload the PDF LinkedIn gives you. No scraping.</div></div>
+      <div class="level"><div class="n">3</div><div class="t">Cross-check</div><div class="d">ChatGPT, Claude or Gemini reads all of it as one set.</div></div>
+    </div>
+    <div class="actions">
+      <button class="primary" id="startBtn">Start</button>
+      <span class="spacer"></span>
+      <button class="ghost" id="demoHonestBtn">Play demo: honest</button>
+      <button class="ghost" id="demoFraudBtn">Play demo: fraud</button>
+    </div>
+  </section>
+
+  <!-- LEVEL 1 -->
+  <section class="screen" data-screen="l1">
+    <div class="kicker">Level 1 of 3</div>
+    <h2>Your resume</h2>
+    <p class="lead">Write it here or paste it in. The page records timing only, never which keys you press. Watch the map below react.</p>
+    <div class="card">
+      <textarea id="resume" spellcheck="false" placeholder="Start typing your resume, or paste one in and watch the map turn red."></textarea>
+      <div class="chips">
+        <span class="chip" id="c-typed">typed <b>0</b></span>
+        <span class="chip" id="c-pasted">pasted <b>0</b></span>
+        <span class="chip" id="c-paste">paste ratio <b>—</b></span>
+        <span class="chip" id="c-cv">rhythm cv <b>—</b></span>
+        <span class="chip" id="c-bs">backspace <b>—</b></span>
+        <span class="chip" id="c-pause">pauses <b>—</b></span>
       </div>
-      <textarea id="resume" spellcheck="false" placeholder="Paste a finished resume here and watch the heatmap turn red. Type it and it stays green."></textarea>
-    </div>
-
-    <div class="field">
-      <div class="field-head">
-        <label for="cover">COVER LETTER (optional)</label>
-        <span class="meta" id="coverMeta">typed <b>0</b> · pasted <b>0</b></span>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+        <h3 style="margin:0">Provenance map</h3>
+        <div class="legend"><span><i style="background:var(--green)"></i>typed</span><span><i style="background:var(--gold)"></i>mixed</span><span><i style="background:var(--red)"></i>pasted</span></div>
       </div>
-      <textarea id="cover" spellcheck="false" style="min-height:90px" placeholder="Optional. Checked against the resume and LinkedIn as one set."></textarea>
+      <div class="heatmap" id="heatmap"><div class="heat-empty">Nothing yet.</div></div>
+      <canvas id="spark" aria-label="Text growth over time"></canvas>
+    </div>
+    <details>
+      <summary>Add a cover letter (optional)</summary>
+      <div class="body"><textarea id="cover" spellcheck="false" style="min-height:110px" placeholder="Checked against the resume and LinkedIn as one set."></textarea></div>
+    </details>
+    <div class="actions">
+      <button class="ghost" data-go="intro">← Back</button>
+      <span class="spacer"></span>
+      <button class="primary" id="l1Next" disabled>Next level →</button>
+    </div>
+  </section>
+
+  <!-- LEVEL 2 -->
+  <section class="screen" data-screen="l2">
+    <div class="kicker">Level 2 of 3</div>
+    <h2>Your LinkedIn</h2>
+    <p class="lead">Upload the PDF LinkedIn generates from your own profile. It is read in this browser and never uploaded anywhere.</p>
+
+    <div class="card">
+      <label class="drop" id="drop">
+        <input type="file" id="pdfFile" accept="application/pdf">
+        <div class="big" id="dropBig">Drop your LinkedIn PDF here</div>
+        <div class="small" id="dropSmall">or click to choose a file · usually named <span class="mono">Profile.pdf</span></div>
+      </label>
+      <div class="msg" id="pdfMsg"></div>
     </div>
 
-    <div class="field">
-      <div class="field-head">
-        <label for="linkedin">LINKEDIN — candidate pastes their own Experience section (no scraping)</label>
-        <span class="meta">self-reported</span>
+    <details id="howto" open>
+      <summary>How do I get this PDF? (3 steps, 20 seconds)</summary>
+      <div class="body">
+        <div class="steps">
+          <div class="step">
+            <div class="fig">
+              <svg viewBox="0 0 320 190" role="img" aria-label="LinkedIn profile header with the More button highlighted">
+                <rect width="320" height="190" fill="#0c0e13"/>
+                <rect x="0" y="0" width="320" height="52" fill="#1d222d"/>
+                <circle cx="46" cy="64" r="26" fill="#2a2f3c" stroke="#0c0e13" stroke-width="4"/>
+                <rect x="20" y="102" width="120" height="10" rx="3" fill="#8b92a5"/>
+                <rect x="20" y="118" width="180" height="7" rx="3" fill="#3a4050"/>
+                <rect x="20" y="131" width="90" height="7" rx="3" fill="#3a4050"/>
+                <rect x="20" y="152" width="64" height="20" rx="10" fill="#5b93d9"/>
+                <rect x="90" y="152" width="94" height="20" rx="10" fill="none" stroke="#5b93d9"/>
+                <rect x="190" y="152" width="52" height="20" rx="10" fill="none" stroke="#8b92a5"/>
+                <text x="216" y="166" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="#edeff4" text-anchor="middle">More ▾</text>
+                <rect x="185" y="147" width="62" height="30" rx="15" fill="none" stroke="#c9a24b" stroke-width="2.5"/>
+              </svg>
+            </div>
+            <div class="cap"><b>1.</b> Open your own profile on linkedin.com and click <b>More</b> under your headline (on some accounts it sits under <b>Resources</b>).</div>
+          </div>
+          <div class="step">
+            <div class="fig">
+              <svg viewBox="0 0 320 190" role="img" aria-label="More menu open with Save to PDF highlighted">
+                <rect width="320" height="190" fill="#0c0e13"/>
+                <rect x="0" y="0" width="320" height="52" fill="#1d222d"/>
+                <rect x="20" y="70" width="120" height="10" rx="3" fill="#8b92a5"/>
+                <rect x="20" y="86" width="180" height="7" rx="3" fill="#3a4050"/>
+                <rect x="190" y="106" width="52" height="20" rx="10" fill="#2a2f3c"/>
+                <text x="216" y="120" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="#edeff4" text-anchor="middle">More ▾</text>
+                <rect x="150" y="130" width="150" height="56" rx="6" fill="#1d222d" stroke="#2a2f3c"/>
+                <text x="162" y="147" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="#8b92a5">Send profile in a message</text>
+                <rect x="153" y="154" width="144" height="18" rx="4" fill="#2a2f3c"/>
+                <text x="162" y="166" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="600" fill="#edeff4">Save to PDF</text>
+                <rect x="151" y="152" width="148" height="22" rx="5" fill="none" stroke="#c9a24b" stroke-width="2.5"/>
+                <text x="162" y="182" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="#8b92a5">Build a resume</text>
+              </svg>
+            </div>
+            <div class="cap"><b>2.</b> Choose <b>Save to PDF</b>. LinkedIn downloads a file with your headline, experience and education.</div>
+          </div>
+          <div class="step">
+            <div class="fig">
+              <svg viewBox="0 0 320 190" role="img" aria-label="Uploading the PDF file into the dropzone">
+                <rect width="320" height="190" fill="#0c0e13"/>
+                <rect x="40" y="40" width="70" height="90" rx="6" fill="#1d222d" stroke="#3a4050"/>
+                <path d="M88 40 L110 62 L88 62 Z" fill="#3a4050"/>
+                <text x="75" y="105" font-family="IBM Plex Mono, monospace" font-size="11" fill="#edeff4" text-anchor="middle">PDF</text>
+                <path d="M122 85 L178 85" stroke="#c9a24b" stroke-width="2.5"/>
+                <path d="M170 77 L180 85 L170 93" fill="none" stroke="#c9a24b" stroke-width="2.5"/>
+                <rect x="190" y="45" width="100" height="80" rx="8" fill="none" stroke="#c9a24b" stroke-width="2" stroke-dasharray="6 5"/>
+                <path d="M240 68 L240 100 M228 80 L240 68 L252 80" fill="none" stroke="#edeff4" stroke-width="2.5"/>
+                <text x="240" y="150" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="#8b92a5" text-anchor="middle">Drop it in the box above</text>
+              </svg>
+            </div>
+            <div class="cap"><b>3.</b> Drop that file in the box above. We pull out the Experience section; you can review it before moving on.</div>
+          </div>
+        </div>
       </div>
-      <textarea id="linkedin" spellcheck="false" style="min-height:100px" placeholder="Copy the Experience section from your LinkedIn profile and paste it here."></textarea>
-    </div>
+    </details>
 
-    <div class="field">
+    <details id="reviewBox">
+      <summary><span id="reviewTitle">Review extracted text · or paste your Experience section instead</span></summary>
+      <div class="body">
+        <textarea id="linkedin" spellcheck="false" style="min-height:140px" placeholder="If you cannot get the PDF, copy the Experience section from your profile and paste it here."></textarea>
+      </div>
+    </details>
+
+    <div class="card">
+      <h3>Three numbers from your profile header</h3>
       <div class="row-3">
-        <div>
-          <label for="conn">CONNECTIONS</label>
-          <input type="number" id="conn" min="0" placeholder="e.g. 412">
-        </div>
-        <div>
-          <label for="followers">FOLLOWERS</label>
-          <input type="number" id="followers" min="0" placeholder="e.g. 455">
-        </div>
-        <div>
-          <label for="created">PROFILE CREATED (YEAR)</label>
-          <input type="number" id="created" min="2003" max="2030" placeholder="e.g. 2019">
-        </div>
+        <div><label class="lbl" for="conn">CONNECTIONS</label><input type="number" id="conn" min="0" placeholder="e.g. 412"></div>
+        <div><label class="lbl" for="followers">FOLLOWERS</label><input type="number" id="followers" min="0" placeholder="e.g. 455"></div>
+        <div><label class="lbl" for="created">YEAR YOU JOINED</label><input type="number" id="created" min="2003" max="2030" placeholder="e.g. 2019"></div>
       </div>
-    </div>
-
-    <div class="llm-box">
-      <div class="title">CROSS-CHECK MODEL — bring your own key, stays in this tab only</div>
-      <div class="llm-grid">
-        <select id="provider" aria-label="Provider">
-          <option value="demo">Demo mode (no key)</option>
-          <option value="openai">ChatGPT (OpenAI)</option>
-          <option value="anthropic">Claude (Anthropic)</option>
-          <option value="gemini">Gemini (Google)</option>
-        </select>
-        <input type="text" id="model" placeholder="model id" aria-label="Model id" spellcheck="false">
-        <input type="password" id="apikey" placeholder="API key" aria-label="API key" autocomplete="off">
-      </div>
-      <div class="note" id="llmNote">Demo mode replays a pre-computed cross-check for the two fixture candidates. Pick a provider and paste a key to run the real thing on any text. Keys live in <code>sessionStorage</code> and never leave this browser except to the provider you chose.</div>
     </div>
 
     <div class="actions">
-      <button class="primary" id="runBtn">Run consistency check</button>
-      <button id="demoHonestBtn">Load demo: honest</button>
-      <button id="demoFraudBtn">Load demo: fraud</button>
-      <button id="resetBtn">Reset</button>
+      <button class="ghost" data-go="l1">← Back</button>
+      <span class="spacer"></span>
+      <button class="primary" id="l2Next">Next level →</button>
     </div>
   </section>
 
-  <section class="log-col">
-    <div class="panel">
-      <div class="heat-head">
-        <div>
-          <h2>Resume provenance</h2>
-          <div class="hint">Timing only: the page never records which keys were pressed.</div>
-        </div>
-        <div class="legend">
-          <span><i style="background:var(--green)"></i>typed</span>
-          <span><i style="background:var(--gold)"></i>mixed</span>
-          <span><i style="background:var(--red)"></i>pasted</span>
-        </div>
+  <!-- LEVEL 3 -->
+  <section class="screen" data-screen="l3">
+    <div class="kicker">Level 3 of 3</div>
+    <h2>Cross-check</h2>
+    <p class="lead">Pick who reads your documents. Your key stays in this tab and goes only to the provider you choose.</p>
+    <div class="card">
+      <div class="models" id="models">
+        <button class="model sel" data-p="demo"><div class="t">Demo mode</div><div class="d">No key. Replays the two demo candidates.</div></button>
+        <button class="model" data-p="openai"><div class="t">ChatGPT</div><div class="d">OpenAI key</div></button>
+        <button class="model" data-p="anthropic"><div class="t">Claude</div><div class="d">Anthropic key</div></button>
+        <button class="model" data-p="gemini"><div class="t">Gemini</div><div class="d">Google AI key</div></button>
       </div>
-      <div class="heatmap" id="heatmap"><div class="heat-empty">Start typing or paste into the resume box.</div></div>
-      <canvas id="spark" aria-label="Text growth over time"></canvas>
-      <div class="metrics">
-        <div class="metric"><div class="n">paste_ratio</div><div class="v" id="m-paste">—</div></div>
-        <div class="metric"><div class="n">rhythm_cv</div><div class="v" id="m-cv">—</div></div>
-        <div class="metric"><div class="n">backspace_ratio</div><div class="v" id="m-bs">—</div></div>
-        <div class="metric"><div class="n">think_pauses</div><div class="v" id="m-pause">—</div></div>
+      <div class="keyrow" id="keyrow" hidden>
+        <input type="text" id="model" placeholder="model id" aria-label="Model id" spellcheck="false">
+        <input type="password" id="apikey" placeholder="API key" aria-label="API key" autocomplete="off">
       </div>
-    </div>
-
-    <div>
-      <h2>Verification log</h2>
-      <div class="hint" style="margin-bottom:8px">Each signal and the points it moved.</div>
-      <div class="log-feed" id="logFeed">
-        <div class="row info"><span class="t">00:00</span><span class="m">Waiting for input…</span></div>
+      <div class="note" id="llmNote">Demo mode replays a pre-computed cross-check for the two demo candidates. Pick a provider and paste a key to check any text for real.</div>
+      <div class="msg" id="runMsg"></div>
+      <div class="tasks" id="tasks" hidden>
+        <div class="task" id="t1"><span class="ic"></span><span>Reading the typing timeline</span><span class="v" id="t1v"></span></div>
+        <div class="task" id="t2"><span class="ic"></span><span>Cross-checking resume, cover letter and LinkedIn</span><span class="v" id="t2v"></span></div>
+        <div class="task" id="t3"><span class="ic"></span><span>Checking profile plausibility</span><span class="v" id="t3v"></span></div>
       </div>
     </div>
-
-    <div class="panel score-card">
-      <div class="label">STAGE2_CONSISTENCY_SCORE</div>
-      <div class="big-score unset" id="bigScore"><span id="bigNum">—</span><span class="status" id="bigStatus">not_started</span></div>
-
-      <div class="sub-scores">
-        <div class="sub-score"><div class="n">provenance</div><div class="v" id="s-prov">—</div><div class="w">weight 0.30</div></div>
-        <div class="sub-score"><div class="n">claim_consistency</div><div class="v" id="s-claims">—</div><div class="w">weight 0.50</div></div>
-        <div class="sub-score"><div class="n">profile_plausibility</div><div class="v" id="s-profile">—</div><div class="w">weight 0.20</div></div>
-      </div>
-
-      <div class="label" style="margin-bottom:6px;">FLAGS</div>
-      <div class="flags" id="flags"><div class="flag-empty">None yet.</div></div>
-
-      <div class="label" style="margin-bottom:6px;">SCORE TRACE</div>
-      <div class="trace" id="trace"><div class="flag-empty">Run the check to see the math.</div></div>
-
-      <div class="label" style="margin:14px 0 6px;">OUTPUT (for Stage 3 / dashboard)</div>
-      <div class="json-box" id="jsonOut">{ "status": "not_started" }</div>
-      <div class="copy-row">
-        <button id="copyBtn">Copy JSON</button>
-        <button id="exportBtn">Save to localStorage</button>
-      </div>
+    <div class="actions">
+      <button class="ghost" data-go="l2">← Back</button>
+      <span class="spacer"></span>
+      <button class="primary" id="runBtn">Run the check</button>
     </div>
   </section>
+
+  <!-- RESULT -->
+  <section class="screen" data-screen="result">
+    <div class="kicker">Result</div>
+    <div class="card score-hero">
+      <div class="num" id="bigNum">0</div>
+      <div class="status" id="bigStatus">—</div>
+      <div class="sub" id="bigSub"></div>
+    </div>
+    <div class="bars">
+      <div class="bar"><div class="n"><span>provenance</span><span>×0.30</span></div><div class="v" id="s-prov">—</div><div class="track"><div class="fill" id="f-prov"></div></div></div>
+      <div class="bar"><div class="n"><span>claims</span><span>×0.50</span></div><div class="v" id="s-claims">—</div><div class="track"><div class="fill" id="f-claims"></div></div></div>
+      <div class="bar"><div class="n"><span>profile</span><span>×0.20</span></div><div class="v" id="s-profile">—</div><div class="track"><div class="fill" id="f-profile"></div></div></div>
+    </div>
+    <div class="card">
+      <h3>Findings</h3>
+      <div class="flags" id="flags"></div>
+    </div>
+    <details>
+      <summary>Score trace: which signal moved how many points</summary>
+      <div class="body"><div class="trace" id="trace"></div></div>
+    </details>
+    <details>
+      <summary>Output JSON for Stage 3 and the dashboard</summary>
+      <div class="body">
+        <div class="json-box" id="jsonOut">{}</div>
+        <div class="actions"><span class="spacer"></span><button class="sm" id="copyBtn">Copy JSON</button><button class="sm" id="exportBtn">Save to localStorage</button></div>
+      </div>
+    </details>
+    <div class="actions">
+      <button class="ghost" id="againBtn">Check another candidate</button>
+      <span class="spacer"></span>
+      <button class="primary" id="handoffBtn">Send to Stage 3 →</button>
+    </div>
+  </section>
+
 </main>
 
 <footer>
-  AI-polished wording is not penalized. Only paste provenance, factual contradictions across resume / cover letter / LinkedIn, and thin or brand-new profiles move the score. Score = 0.30·provenance + 0.50·claims + 0.20·profile; ≥ 60 clears Stage 2. Output is written to <span class="mono">localStorage["trustfunnel.stage2.&lt;candidate_id&gt;"]</span> for the dashboard.
+  Score = 0.30·provenance + 0.50·claims + 0.20·profile; ≥ 60 clears Stage 2. Output is written to <span class="mono">localStorage["trustfunnel.stage2.&lt;candidate_id&gt;"]</span>. PDF parsing runs in this browser with pdf.js.
 </footer>
 
 <script>
 (function () {
   'use strict';
-
-  // ---------- DOM ----------
   const $ = id => document.getElementById(id);
   const resumeEl = $('resume'), coverEl = $('cover'), linkedinEl = $('linkedin');
   const connEl = $('conn'), followersEl = $('followers'), createdEl = $('created');
-  const providerEl = $('provider'), modelEl = $('model'), apikeyEl = $('apikey'), llmNote = $('llmNote');
-  const runBtn = $('runBtn'), resetBtn = $('resetBtn'), copyBtn = $('copyBtn'), exportBtn = $('exportBtn');
-  const logFeed = $('logFeed'), heatmap = $('heatmap'), spark = $('spark');
-  const jsonOut = $('jsonOut'), bigScore = $('bigScore'), bigNum = $('bigNum'), bigStatus = $('bigStatus');
-  const flagsEl = $('flags'), traceEl = $('trace');
-  const dots = [1, 2, 3, 4].map(n => $('dot-' + n));
-  const labels = [1, 2, 3, 4].map(n => $('lbl-' + n));
-
+  const modelEl = $('model'), apikeyEl = $('apikey'), llmNote = $('llmNote'), keyrow = $('keyrow');
+  const heatmap = $('heatmap'), spark = $('spark');
   const WEIGHTS = { provenance: 0.30, claims: 0.50, profile: 0.20 };
   const GATE = 60;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- screens / progress ----------
+  const screens = [...document.querySelectorAll('.screen')];
+  const LEVEL = { intro: 0, l1: 1, l2: 2, l3: 3, result: 4 };
+  function go(name) {
+    screens.forEach(s => s.classList.toggle('on', s.dataset.screen === name));
+    const n = LEVEL[name];
+    [1, 2, 3].forEach(i => { const s = $('seg-' + i); s.classList.toggle('done', n > i || name === 'result'); s.classList.toggle('active', n === i); });
+    $('lvlText').innerHTML = name === 'intro' ? '<b>Ready</b>' : name === 'result' ? '<b>Complete</b>' : 'Level <b>' + n + '</b> / 3';
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    if (name === 'l1') { renderProvenance(); setTimeout(() => resumeEl.focus(), 50); }
+  }
+  document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
 
   // ---------- provenance tracker (timing only, never key identity) ----------
-  function makeTracker(el, metaEl) {
-    const st = {
-      typedChars: 0, pastedChars: 0, backspaces: 0,
-      pastes: [],           // { text, len, t }
-      ikis: [], holds: [], pauses: 0,
-      lastKeyT: null, downT: new Map(), startT: null,
-      timeline: [],         // { t, len }
-      override: null        // fixture metrics
-    };
+  function makeTracker(el) {
+    const st = { typedChars: 0, pastedChars: 0, backspaces: 0, pastes: [], ikis: [], holds: [], pauses: 0, lastKeyT: null, downT: new Map(), startT: null, timeline: [], override: null };
     const now = () => performance.now();
-    const mark = () => {
-      if (st.startT === null) st.startT = now();
-      st.timeline.push({ t: (now() - st.startT) / 1000, len: el.value.length });
-      if (st.timeline.length > 2000) st.timeline.shift();
-    };
     el.addEventListener('keydown', e => {
       st.override = null;
       const t = now();
       if (st.startT === null) st.startT = t;
       if (e.key === 'Backspace' || e.key === 'Delete') st.backspaces++;
-      if (st.lastKeyT !== null) {
-        const gap = t - st.lastKeyT;
-        if (gap >= 2000) st.pauses++; else st.ikis.push(gap);
-      }
+      if (st.lastKeyT !== null) { const gap = t - st.lastKeyT; if (gap >= 2000) st.pauses++; else st.ikis.push(gap); }
       st.lastKeyT = t;
       st.downT.set(e.code || e.key, t);
     });
-    el.addEventListener('keyup', e => {
-      const d = st.downT.get(e.code || e.key);
-      if (d !== undefined) { st.holds.push(now() - d); st.downT.delete(e.code || e.key); }
-    });
-    el.addEventListener('paste', e => {
-      st.override = null;
-      const text = (e.clipboardData && e.clipboardData.getData('text')) || '';
-      if (text.length) st.pastes.push({ text, len: text.length, t: now() });
-      st.pastedChars += text.length;
-    });
-    el.addEventListener('drop', e => {
-      const text = (e.dataTransfer && e.dataTransfer.getData('text')) || '';
-      if (text.length) { st.pastes.push({ text, len: text.length, t: now() }); st.pastedChars += text.length; }
-    });
+    el.addEventListener('keyup', e => { const d = st.downT.get(e.code || e.key); if (d !== undefined) { st.holds.push(now() - d); st.downT.delete(e.code || e.key); } });
+    const addPaste = text => { if (text.length) { st.pastes.push({ text, len: text.length, t: now() }); st.pastedChars += text.length; } };
+    el.addEventListener('paste', e => { st.override = null; addPaste((e.clipboardData && e.clipboardData.getData('text')) || ''); });
+    el.addEventListener('drop', e => addPaste((e.dataTransfer && e.dataTransfer.getData('text')) || ''));
     el.addEventListener('input', e => {
       const it = e.inputType || '';
       if (it === 'insertText' || it === 'insertLineBreak' || it === 'insertCompositionText') st.typedChars += (e.data || (it === 'insertLineBreak' ? '\n' : '')).length;
-      mark();
-      if (metaEl) metaEl.innerHTML = 'typed <b>' + st.typedChars + '</b> · pasted <b>' + st.pastedChars + '</b>';
-      if (el === resumeEl) renderProvenance();
+      if (st.startT === null) st.startT = now();
+      st.timeline.push({ t: (now() - st.startT) / 1000, len: el.value.length });
+      if (st.timeline.length > 2000) st.timeline.shift();
+      if (el === resumeEl) { renderProvenance(); $('l1Next').disabled = !el.value.trim(); }
     });
     return st;
   }
+  const trackers = { resume: makeTracker(resumeEl), cover: makeTracker(coverEl) };
 
-  const trackers = { resume: makeTracker(resumeEl, $('resumeMeta')), cover: makeTracker(coverEl, $('coverMeta')) };
-
-  function cv(arr) {
-    if (arr.length < 2) return null;
-    const m = arr.reduce((a, b) => a + b, 0) / arr.length;
-    if (!m) return null;
-    const v = arr.reduce((a, b) => a + (b - m) * (b - m), 0) / arr.length;
-    return Math.sqrt(v) / m;
-  }
-
+  function cv(arr) { if (arr.length < 2) return null; const m = arr.reduce((a, b) => a + b, 0) / arr.length; if (!m) return null; const v = arr.reduce((a, b) => a + (b - m) * (b - m), 0) / arr.length; return Math.sqrt(v) / m; }
   function metricsOf(st, el) {
     if (st.override) return st.override;
     const len = el.value.length;
     const largest = st.pastes.reduce((a, p) => Math.max(a, p.len), 0);
-    return {
-      final_chars: len,
-      typed_chars: st.typedChars,
-      pasted_chars: st.pastedChars,
-      paste_ratio: len ? Math.min(1, st.pastedChars / len) : 0,
-      largest_paste_ratio: len ? Math.min(1, largest / len) : 0,
-      rhythm_cv: st.ikis.length >= 20 ? cv(st.ikis) : null,
-      hold_cv: st.holds.length >= 20 ? cv(st.holds) : null,
-      backspace_ratio: st.typedChars ? st.backspaces / st.typedChars : 0,
-      think_pauses: st.pauses,
-      session_seconds: st.startT === null ? 0 : Math.round((performance.now() - st.startT) / 1000),
-      paste_events: st.pastes.length
-    };
+    return { final_chars: len, typed_chars: st.typedChars, pasted_chars: st.pastedChars,
+      paste_ratio: len ? Math.min(1, st.pastedChars / len) : 0, largest_paste_ratio: len ? Math.min(1, largest / len) : 0,
+      rhythm_cv: st.ikis.length >= 20 ? cv(st.ikis) : null, hold_cv: st.holds.length >= 20 ? cv(st.holds) : null,
+      backspace_ratio: st.typedChars ? st.backspaces / st.typedChars : 0, think_pauses: st.pauses,
+      session_seconds: st.startT === null ? 0 : Math.round((performance.now() - st.startT) / 1000), paste_events: st.pastes.length };
   }
-
   const norm = s => s.replace(/\s+/g, ' ').trim().toLowerCase();
-
-  function paragraphs(text) {
-    let parts = text.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
-    if (parts.length <= 1) parts = text.split(/\n/).map(s => s.trim()).filter(Boolean);
-    return parts;
-  }
-
+  const pct = x => Math.round((x || 0) * 100) + '%';
+  function paragraphs(text) { let p = text.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean); if (p.length <= 1) p = text.split(/\n/).map(s => s.trim()).filter(Boolean); return p; }
   function coverage(par, pastes) {
-    const p = norm(par);
-    if (!p) return 0;
-    let cov = 0;
-    for (const paste of pastes) {
-      const q = norm(paste.text);
-      if (q.length < 12) continue;
-      if (q.includes(p)) return 1;
-      if (p.includes(q)) cov += q.length / p.length;
-    }
-    return Math.min(1, cov);
+    const p = norm(par); if (!p) return 0; let c = 0;
+    for (const paste of pastes) { const q = norm(paste.text); if (q.length < 12) continue; if (q.includes(p)) return 1; if (p.includes(q)) c += q.length / p.length; }
+    return Math.min(1, c);
   }
-
+  function chip(id, v, cls) { const el = $(id); el.querySelector('b').textContent = v; el.className = 'chip ' + (cls || ''); }
   function renderProvenance() {
-    const st = trackers.resume;
-    const text = resumeEl.value;
-    const pars = paragraphs(text);
+    const st = trackers.resume, pars = paragraphs(resumeEl.value);
     heatmap.innerHTML = '';
-    if (!pars.length) {
-      heatmap.innerHTML = '<div class="heat-empty">Start typing or paste into the resume box.</div>';
-    } else {
-      for (const par of pars) {
-        const c = coverage(par, st.pastes);
-        const cls = c >= 0.8 ? 'pasted' : c >= 0.3 ? 'mixed' : '';
-        const tag = c >= 0.8 ? 'PASTED ' + Math.round(c * 100) + '%' : c >= 0.3 ? 'MIXED ' + Math.round(c * 100) + '%' : 'TYPED';
-        const d = document.createElement('div');
-        d.className = 'heat-block ' + cls;
-        d.innerHTML = '<span class="txt"></span><span class="tag">' + tag + '</span>';
-        d.querySelector('.txt').textContent = par;
-        heatmap.appendChild(d);
-      }
+    if (!pars.length) heatmap.innerHTML = '<div class="heat-empty">Nothing yet.</div>';
+    for (const par of pars) {
+      const c = coverage(par, st.pastes);
+      const cls = c >= 0.8 ? 'pasted' : c >= 0.3 ? 'mixed' : '';
+      const tag = c >= 0.8 ? 'PASTED ' + Math.round(c * 100) + '%' : c >= 0.3 ? 'MIXED ' + Math.round(c * 100) + '%' : 'TYPED';
+      const d = document.createElement('div'); d.className = 'heat-block ' + cls;
+      d.innerHTML = '<span class="txt"></span><span class="tag">' + tag + '</span>';
+      d.querySelector('.txt').textContent = par; heatmap.appendChild(d);
     }
     const m = metricsOf(st, resumeEl);
-    setMetric('m-paste', pct(m.paste_ratio), m.paste_ratio >= 0.6 ? 'bad' : m.paste_ratio <= 0.3 ? 'ok' : '');
-    setMetric('m-cv', m.rhythm_cv === null ? '—' : m.rhythm_cv.toFixed(2), m.rhythm_cv === null ? '' : m.rhythm_cv < 0.25 ? 'bad' : 'ok');
-    setMetric('m-bs', pct(m.backspace_ratio), '');
-    setMetric('m-pause', String(m.think_pauses), '');
+    chip('c-typed', String(m.typed_chars)); chip('c-pasted', String(m.pasted_chars));
+    chip('c-paste', pct(m.paste_ratio), m.paste_ratio >= 0.6 ? 'bad' : m.paste_ratio <= 0.3 && m.final_chars ? 'ok' : '');
+    chip('c-cv', m.rhythm_cv === null ? '—' : m.rhythm_cv.toFixed(2), m.rhythm_cv === null ? '' : m.rhythm_cv < 0.25 ? 'bad' : 'ok');
+    chip('c-bs', m.final_chars ? pct(m.backspace_ratio) : '—'); chip('c-pause', m.final_chars ? String(m.think_pauses) : '—');
     drawSpark(st.override ? st.override.timeline : st.timeline);
   }
-
-  function setMetric(id, v, cls) { const el = $(id); el.textContent = v; el.className = 'v ' + (cls || ''); }
-  const pct = x => Math.round((x || 0) * 100) + '%';
-
   function drawSpark(tl) {
-    const dpr = window.devicePixelRatio || 1;
-    const w = spark.clientWidth || 300, h = 44;
+    const dpr = window.devicePixelRatio || 1, w = spark.clientWidth || 300, h = 40;
     spark.width = w * dpr; spark.height = h * dpr;
-    const ctx = spark.getContext('2d');
-    ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, w, h);
-    ctx.strokeStyle = '#2a2f3c'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(0, h - 0.5); ctx.lineTo(w, h - 0.5); ctx.stroke();
+    const ctx = spark.getContext('2d'); ctx.scale(dpr, dpr); ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = '#2a2f3c'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, h - 0.5); ctx.lineTo(w, h - 0.5); ctx.stroke();
     if (!tl || tl.length < 2) return;
     const maxT = Math.max(tl[tl.length - 1].t, 1), maxL = Math.max(...tl.map(p => p.len), 1);
-    ctx.strokeStyle = '#5b93d9'; ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    tl.forEach((p, i) => {
-      const x = (p.t / maxT) * (w - 2) + 1, y = h - 2 - (p.len / maxL) * (h - 6);
-      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
-    });
-    ctx.stroke();
-    // mark vertical jumps (pastes)
-    ctx.fillStyle = '#d9694f';
-    for (let i = 1; i < tl.length; i++) {
-      if (tl[i].len - tl[i - 1].len > Math.max(40, maxL * 0.15)) {
-        const x = (tl[i].t / maxT) * (w - 2) + 1;
-        ctx.fillRect(x - 1, 2, 2, h - 4);
-      }
-    }
+    ctx.strokeStyle = '#5b93d9'; ctx.lineWidth = 1.5; ctx.beginPath();
+    tl.forEach((p, i) => { const x = (p.t / maxT) * (w - 2) + 1, y = h - 2 - (p.len / maxL) * (h - 6); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+    ctx.stroke(); ctx.fillStyle = '#d9694f';
+    for (let i = 1; i < tl.length; i++) if (tl[i].len - tl[i - 1].len > Math.max(40, maxL * 0.15)) ctx.fillRect((tl[i].t / maxT) * (w - 2), 2, 2, h - 4);
   }
 
   function provenanceScore(m, trace, flags) {
     let s = 100;
-    const d1 = -Math.round(60 * m.paste_ratio);
-    trace.push({ signal: 'paste_ratio', value: pct(m.paste_ratio), delta: d1 }); s += d1;
+    const d1 = -Math.round(60 * m.paste_ratio); trace.push({ signal: 'paste_ratio', value: pct(m.paste_ratio), delta: d1 }); s += d1;
     if (m.largest_paste_ratio >= 0.6) {
-      const d = -10; s += d;
-      trace.push({ signal: 'largest_single_paste', value: pct(m.largest_paste_ratio), delta: d });
-      flags.push({ code: 'PASTED_BLOCK', severity: m.largest_paste_ratio >= 0.85 ? 'high' : 'medium',
-        message: Math.round(m.largest_paste_ratio * 100) + '% of the resume arrived in a single paste',
-        evidence: { largest_paste_ratio: +m.largest_paste_ratio.toFixed(2), paste_events: m.paste_events } });
+      s -= 10; trace.push({ signal: 'largest_single_paste', value: pct(m.largest_paste_ratio), delta: -10 });
+      flags.push({ code: 'PASTED_BLOCK', severity: m.largest_paste_ratio >= 0.85 ? 'high' : 'medium', message: Math.round(m.largest_paste_ratio * 100) + '% of the resume arrived in a single paste', evidence: { largest_paste_ratio: +m.largest_paste_ratio.toFixed(2), paste_events: m.paste_events } });
     } else trace.push({ signal: 'largest_single_paste', value: pct(m.largest_paste_ratio), delta: 0 });
     if (m.rhythm_cv !== null && m.rhythm_cv < 0.25) {
-      const d = -25; s += d;
-      trace.push({ signal: 'rhythm_cv', value: m.rhythm_cv.toFixed(2), delta: d });
-      flags.push({ code: 'UNIFORM_TYPING', severity: 'high', message: 'Inter-key timing is near-uniform (cv ' + m.rhythm_cv.toFixed(2) + ') — automated input pattern', evidence: { rhythm_cv: +m.rhythm_cv.toFixed(2) } });
+      s -= 25; trace.push({ signal: 'rhythm_cv', value: m.rhythm_cv.toFixed(2), delta: -25 });
+      flags.push({ code: 'UNIFORM_TYPING', severity: 'high', message: 'Inter-key timing is near-uniform (cv ' + m.rhythm_cv.toFixed(2) + '): automated input pattern', evidence: { rhythm_cv: +m.rhythm_cv.toFixed(2) } });
     } else trace.push({ signal: 'rhythm_cv', value: m.rhythm_cv === null ? 'n/a' : m.rhythm_cv.toFixed(2), delta: 0 });
-    if (m.typed_chars >= 120 && m.backspace_ratio < 0.01) {
-      const d = -8; s += d;
-      trace.push({ signal: 'backspace_ratio', value: pct(m.backspace_ratio), delta: d });
-    } else trace.push({ signal: 'backspace_ratio', value: pct(m.backspace_ratio), delta: 0 });
+    if (m.typed_chars >= 120 && m.backspace_ratio < 0.01) { s -= 8; trace.push({ signal: 'backspace_ratio', value: pct(m.backspace_ratio), delta: -8 }); }
+    else trace.push({ signal: 'backspace_ratio', value: pct(m.backspace_ratio), delta: 0 });
     trace.push({ signal: 'think_pauses', value: String(m.think_pauses), delta: 0 });
     if (m.typed_chars < 30 && m.pasted_chars > 200) s = Math.min(s, 35);
     return Math.max(0, Math.min(100, Math.round(s)));
   }
 
-  // ---------- profile plausibility (local rules on self-reported numbers) ----------
+  // ---------- LinkedIn PDF (parsed in-browser) ----------
+  const pdfState = { source: 'none', filename: null, pages: 0, producer: null };
+  const drop = $('drop'), pdfFile = $('pdfFile'), pdfMsg = $('pdfMsg');
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => { const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (f) handlePdf(f); });
+  pdfFile.addEventListener('change', () => { if (pdfFile.files[0]) handlePdf(pdfFile.files[0]); });
+
+  async function handlePdf(file) {
+    pdfMsg.textContent = '';
+    if (!window.pdfjsLib) { pdfMsg.textContent = 'PDF reader failed to load (offline?). Paste your Experience section below instead.'; return; }
+    if (file.type && file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name)) { pdfMsg.textContent = 'That is not a PDF.'; return; }
+    $('dropBig').textContent = 'Reading ' + file.name + '…';
+    try {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      let lines = [];
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const tc = await page.getTextContent();
+        let curY = null, cur = [];
+        for (const it of tc.items) {
+          if (!('str' in it)) continue;
+          const y = Math.round(it.transform[5]);
+          if (curY !== null && Math.abs(y - curY) > 2) { lines.push(cur.join('').trim()); cur = []; }
+          curY = y; cur.push(it.str + (it.hasEOL ? '' : ' '));
+        }
+        if (cur.length) lines.push(cur.join('').trim());
+        lines.push('');
+      }
+      const full = lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+      const exp = sliceSection(full, /^Experience$/im, /^(Education|Licenses|Certifications|Skills|Languages|Honors)/im);
+      linkedinEl.value = exp || full;
+      let meta = {};
+      try { meta = (await pdf.getMetadata()).info || {}; } catch (e) {}
+      const prod = [meta.Creator, meta.Producer].filter(Boolean).join(' / ');
+      Object.assign(pdfState, { source: 'pdf', filename: file.name, pages: pdf.numPages, producer: prod ? prod.slice(0, 40) : null });
+      const roles = (exp || '').split('\n').filter(l => /\b(19|20)\d{2}\b/.test(l) && /present|\b(19|20)\d{2}\b.*\b(19|20)\d{2}\b/i.test(l)).length;
+      drop.classList.add('done');
+      $('dropBig').textContent = 'Read ' + file.name;
+      $('dropSmall').textContent = pdf.numPages + ' page' + (pdf.numPages > 1 ? 's' : '') + (exp ? ' · Experience section found' + (roles ? ' (' + roles + ' role' + (roles > 1 ? 's' : '') + ')' : '') : ' · no Experience heading, using full text') + (pdfState.producer ? ' · producer: ' + pdfState.producer : '');
+      $('reviewTitle').textContent = 'Review extracted text (' + linkedinEl.value.length + ' chars)';
+      $('reviewBox').open = true; $('howto').open = false;
+    } catch (err) {
+      drop.classList.remove('done'); $('dropBig').textContent = 'Drop your LinkedIn PDF here';
+      pdfMsg.textContent = 'Could not read that PDF: ' + err.message + '. Paste your Experience section below instead.';
+    }
+  }
+  function sliceSection(text, startRe, endRe) {
+    const lines = text.split('\n'); let s = -1, e = lines.length;
+    for (let i = 0; i < lines.length; i++) { if (s < 0 && startRe.test(lines[i].trim())) { s = i + 1; continue; } if (s >= 0 && endRe.test(lines[i].trim())) { e = i; break; } }
+    return s < 0 ? '' : lines.slice(s, e).join('\n').trim();
+  }
+  linkedinEl.addEventListener('input', () => { if (pdfState.source !== 'pdf') pdfState.source = linkedinEl.value.trim() ? 'pasted' : 'none'; });
+
+  // ---------- profile plausibility ----------
   function profileScore(input, llm, trace, flags) {
-    const hasLinkedIn = !!input.linkedin_text.trim();
-    if (!hasLinkedIn && input.connections === null) {
+    const has = !!input.linkedin_text.trim();
+    if (!has && input.connections === null) {
       trace.push({ signal: 'linkedin_provided', value: 'no', delta: -50 });
-      flags.push({ code: 'LINKEDIN_NOT_PROVIDED', severity: 'low', message: 'No LinkedIn data supplied — profile checks skipped', evidence: {} });
+      flags.push({ code: 'LINKEDIN_NOT_PROVIDED', severity: 'low', message: 'No LinkedIn data supplied, so profile checks were skipped', evidence: {} });
       return 50;
     }
     let s = 100;
+    trace.push({ signal: 'linkedin_source', value: pdfState.source + (pdfState.pages ? ' (' + pdfState.pages + 'p)' : ''), delta: 0 });
     const c = input.connections;
     if (c !== null) {
-      if (c < 50) { s -= 40; trace.push({ signal: 'connections', value: String(c), delta: -40 }); flags.push({ code: 'THIN_PROFILE', severity: 'high', message: 'Only ' + c + ' connections — thin network for the claimed career', evidence: { connections: c } }); }
-      else if (c < 150) { s -= 15; trace.push({ signal: 'connections', value: String(c), delta: -15 }); flags.push({ code: 'THIN_PROFILE', severity: 'low', message: c + ' connections — lighter than expected', evidence: { connections: c } }); }
+      if (c < 50) { s -= 40; trace.push({ signal: 'connections', value: String(c), delta: -40 }); flags.push({ code: 'THIN_PROFILE', severity: 'high', message: 'Only ' + c + ' connections: thin network for the claimed career', evidence: { connections: c } }); }
+      else if (c < 150) { s -= 15; trace.push({ signal: 'connections', value: String(c), delta: -15 }); flags.push({ code: 'THIN_PROFILE', severity: 'low', message: c + ' connections, lighter than expected', evidence: { connections: c } }); }
       else trace.push({ signal: 'connections', value: String(c), delta: 0 });
     }
     const f = input.followers;
@@ -624,7 +664,7 @@
     else if (f !== null) trace.push({ signal: 'followers', value: String(f), delta: 0 });
     const y = input.created_year, thisYear = new Date().getFullYear();
     if (y !== null) {
-      if (y >= thisYear) { s -= 40; trace.push({ signal: 'profile_age', value: '< 1y', delta: -40 }); flags.push({ code: 'NEW_PROFILE', severity: 'high', message: 'LinkedIn profile created this year — no history behind the claims', evidence: { created_year: y } }); }
+      if (y >= thisYear) { s -= 40; trace.push({ signal: 'profile_age', value: '< 1y', delta: -40 }); flags.push({ code: 'NEW_PROFILE', severity: 'high', message: 'LinkedIn profile created this year: no history behind the claims', evidence: { created_year: y } }); }
       else if (y === thisYear - 1) { s -= 15; trace.push({ signal: 'profile_age', value: '~1y', delta: -15 }); flags.push({ code: 'NEW_PROFILE', severity: 'medium', message: 'LinkedIn profile is about a year old', evidence: { created_year: y } }); }
       else trace.push({ signal: 'profile_age', value: (thisYear - y) + 'y', delta: 0 });
     }
@@ -634,8 +674,8 @@
     return Math.max(0, Math.min(100, Math.round(s)));
   }
 
-  // ---------- claims cross-check (LLM) ----------
-  const SYSTEM_PROMPT = `You are a hiring-fraud consistency checker. You receive a candidate's RESUME, optional COVER LETTER, and the EXPERIENCE section they pasted from their own LinkedIn profile.
+  // ---------- claims cross-check (LLM, BYOK) ----------
+  const SYSTEM_PROMPT = `You are a hiring-fraud consistency checker. You receive a candidate's RESUME, optional COVER LETTER, and the EXPERIENCE section from the PDF LinkedIn generated for their own profile.
 Your job is to find FACTUAL inconsistencies across the three documents as a set. AI-polished wording, formatting, or buzzwords are NOT a problem and must not lower the score. Only contradictions in companies, titles, dates, durations, degrees, or quantified claims count.
 Rules:
 - A title is "inflated" when the resume title is at least one seniority level above the LinkedIn title for the same company and period (e.g. Intern -> Engineer, Engineer -> Senior Staff Engineer, Manager -> Director).
@@ -651,61 +691,39 @@ Return ONLY a JSON object with exactly this shape:
  "linkedin_only_companies":[],
  "claims_score":0,
  "summary":""}`;
-
-  const PROVIDERS = {
-    openai: { model: 'gpt-4o-mini', label: 'ChatGPT' },
-    anthropic: { model: 'claude-sonnet-5', label: 'Claude' },
-    gemini: { model: 'gemini-2.5-flash', label: 'Gemini' }
-  };
-
+  const PROVIDERS = { openai: { model: 'gpt-4o-mini', label: 'ChatGPT' }, anthropic: { model: 'claude-sonnet-5', label: 'Claude' }, gemini: { model: 'gemini-2.5-flash', label: 'Gemini' } };
+  let provider = 'demo';
   function userPrompt(input) {
-    return 'RESUME:\n' + input.resume_text + '\n\nCOVER LETTER:\n' + (input.cover_text || '(none)') +
-      '\n\nLINKEDIN EXPERIENCE (self-pasted):\n' + (input.linkedin_text || '(none)') +
+    return 'RESUME:\n' + input.resume_text + '\n\nCOVER LETTER:\n' + (input.cover_text || '(none)') + '\n\nLINKEDIN EXPERIENCE (from the candidate\'s own LinkedIn PDF):\n' + (input.linkedin_text || '(none)') +
       '\n\nSelf-reported LinkedIn stats: connections=' + input.connections + ', followers=' + input.followers + ', profile_created_year=' + input.created_year;
   }
-
-  function extractJson(text) {
-    const m = text.match(/\{[\s\S]*\}/);
-    if (!m) throw new Error('model returned no JSON');
-    return JSON.parse(m[0]);
-  }
-
-  async function callLLM(provider, model, key, input) {
-    const u = userPrompt(input);
-    let res, text;
-    if (provider === 'openai') {
-      res = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-        body: JSON.stringify({ model, temperature: 0, response_format: { type: 'json_object' },
-          messages: [{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content: u }] })
-      });
+  function extractJson(text) { const m = text.match(/\{[\s\S]*\}/); if (!m) throw new Error('model returned no JSON'); return JSON.parse(m[0]); }
+  async function callLLM(p, model, key, input) {
+    const u = userPrompt(input); let res, text;
+    if (p === 'openai') {
+      res = await fetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+        body: JSON.stringify({ model, temperature: 0, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content: u }] }) });
       if (!res.ok) throw new Error('OpenAI ' + res.status + ': ' + (await res.text()).slice(0, 200));
       text = (await res.json()).choices[0].message.content;
-    } else if (provider === 'anthropic') {
-      res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-        body: JSON.stringify({ model, max_tokens: 2500, temperature: 0, system: SYSTEM_PROMPT, messages: [{ role: 'user', content: u }] })
-      });
+    } else if (p === 'anthropic') {
+      res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model, max_tokens: 2500, temperature: 0, system: SYSTEM_PROMPT, messages: [{ role: 'user', content: u }] }) });
       if (!res.ok) throw new Error('Anthropic ' + res.status + ': ' + (await res.text()).slice(0, 200));
       text = (await res.json()).content.map(c => c.text || '').join('');
-    } else if (provider === 'gemini') {
-      res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key), {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: [{ role: 'user', parts: [{ text: u }] }],
-          generationConfig: { temperature: 0, responseMimeType: 'application/json' } })
-      });
+    } else if (p === 'gemini') {
+      res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key), { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: [{ role: 'user', parts: [{ text: u }] }], generationConfig: { temperature: 0, responseMimeType: 'application/json' } }) });
       if (!res.ok) throw new Error('Gemini ' + res.status + ': ' + (await res.text()).slice(0, 200));
-      text = (await res.json()).candidates[0].content.parts.map(p => p.text || '').join('');
+      text = (await res.json()).candidates[0].content.parts.map(x => x.text || '').join('');
     } else throw new Error('unknown provider');
     return extractJson(text);
   }
-
   function claimsScore(llm, trace, flags) {
     let s = Math.max(0, Math.min(100, Math.round(Number(llm.claims_score) || 0)));
     trace.push({ signal: 'llm_claims_score', value: String(s), delta: s - 100 });
     (llm.matches || []).forEach(m => {
       if (m.title_verdict === 'inflated') flags.push({ code: 'TITLE_INFLATED', severity: 'high', message: 'Resume says "' + m.resume_title + '" at ' + m.company + '; LinkedIn says "' + m.linkedin_title + '"', evidence: { company: m.company, resume: m.resume_title, linkedin: m.linkedin_title } });
-      if (m.date_verdict === 'mismatch') flags.push({ code: 'DATE_MISMATCH', severity: 'medium', message: 'Dates for ' + m.company + ' differ between resume and LinkedIn' + (m.note ? ' — ' + m.note : ''), evidence: { company: m.company } });
+      if (m.date_verdict === 'mismatch') flags.push({ code: 'DATE_MISMATCH', severity: 'medium', message: 'Dates for ' + m.company + ' differ between resume and LinkedIn' + (m.note ? ': ' + m.note : ''), evidence: { company: m.company } });
     });
     (llm.contradictions || []).forEach(c => flags.push({ code: 'DOC_CONTRADICTION', severity: c.severity || 'medium', message: c.explanation, evidence: { a: c.a, b: c.b } }));
     (llm.resume_only_companies || []).forEach(co => flags.push({ code: 'COMPANY_NOT_ON_LINKEDIN', severity: 'medium', message: co + ' appears on the resume but not on LinkedIn', evidence: { company: co } }));
@@ -730,8 +748,7 @@ Skills: Go, Python, Postgres, Redis, Kubernetes, gRPC, Terraform, observability 
 
 B.S. Computer Science, SUNY Binghamton, 2019`,
       cover: `I've spent the last three years at Northwind running the tracking API that every customer touches, and before that three years at Brightline turning a monolith into services. I'd like to bring that to your platform team.`,
-      linkedin: `Experience
-Software Engineer II
+      linkedin: `Software Engineer II
 Northwind Logistics · Full-time
 Mar 2022 – Present · Brooklyn, New York
 Shipment tracking API, Go / Postgres / Redis.
@@ -739,14 +756,11 @@ Shipment tracking API, Go / Postgres / Redis.
 Software Engineer
 Brightline Health · Full-time
 Jul 2019 – Feb 2022 · New York
-Patient intake service, Django. Monolith to services migration.
-
-Education
-SUNY Binghamton — B.S. Computer Science, 2015 – 2019`,
-      conn: 412, followers: 455, created: 2018,
+Patient intake service, Django. Monolith to services migration.`,
+      conn: 412, followers: 455, created: 2018, pdf: { source: 'pdf', filename: 'Profile.pdf', pages: 2, producer: 'LinkedIn' },
       pastes: [{ text: 'Skills: Go, Python, Postgres, Redis, Kubernetes, gRPC, Terraform, observability (OpenTelemetry, Grafana)', len: 104 }],
       metrics: { final_chars: 780, typed_chars: 676, pasted_chars: 104, paste_ratio: 0.13, largest_paste_ratio: 0.13, rhythm_cv: 0.68, hold_cv: 0.41, backspace_ratio: 0.07, think_pauses: 9, session_seconds: 1380, paste_events: 1,
-        timeline: [0,60,120,180,240,300,360,420,480,540,600,660,720,780,840,900,960,1020,1080,1140,1200,1260,1320,1380].map((t, i) => ({ t, len: Math.round(Math.min(780, i * 31 + (i === 17 ? 104 : 0) + (i > 17 ? 104 : 0))) })) },
+        timeline: Array.from({ length: 24 }, (_, i) => ({ t: i * 60, len: Math.min(780, i * 31 + (i >= 17 ? 104 : 0)) })) },
       llm: {
         resume_positions: [{ company: 'Northwind Logistics', title: 'Software Engineer II', start: '2022-03', end: 'present' }, { company: 'Brightline Health', title: 'Software Engineer', start: '2019-07', end: '2022-02' }],
         linkedin_positions: [{ company: 'Northwind Logistics', title: 'Software Engineer II', start: '2022-03', end: 'present' }, { company: 'Brightline Health', title: 'Software Engineer', start: '2019-07', end: '2022-02' }],
@@ -769,16 +783,12 @@ Skills: Kubernetes, Go, Rust, Kafka, Flink, AWS, GCP, distributed systems, team 
 
 M.S. Computer Science, Stanford University, 2017`,
       cover: `With six years leading platform teams at Acme Cloud and Vertex Analytics, I have built the kind of infrastructure your job description calls for and can start immediately.`,
-      linkedin: `Experience
-Software Engineering Intern
+      linkedin: `Software Engineering Intern
 Acme Cloud · Internship
 Jun 2026 – Present · Remote
-Working on internal dashboards.
-
-Education
-Stanford University — M.S. Computer Science, 2017`,
-      conn: 12, followers: 9, created: 2026,
-      pastes: [],   // filled at load: the whole resume as one paste
+Working on internal dashboards.`,
+      conn: 12, followers: 9, created: 2026, pdf: { source: 'pdf', filename: 'Profile.pdf', pages: 1, producer: 'LinkedIn' },
+      pastes: [],
       metrics: { final_chars: 720, typed_chars: 14, pasted_chars: 706, paste_ratio: 0.98, largest_paste_ratio: 0.98, rhythm_cv: null, hold_cv: null, backspace_ratio: 0, think_pauses: 0, session_seconds: 41, paste_events: 1,
         timeline: [{ t: 0, len: 0 }, { t: 6, len: 4 }, { t: 12, len: 9 }, { t: 14, len: 14 }, { t: 15, len: 720 }, { t: 41, len: 720 }] },
       llm: {
@@ -794,234 +804,156 @@ Stanford University — M.S. Computer Science, 2017`,
       }
     }
   };
-
   let activeFixture = null;
-
   function loadFixture(key) {
-    const f = FIXTURES[key];
-    activeFixture = key;
+    const f = FIXTURES[key]; activeFixture = key;
     $('candId').value = f.id;
     resumeEl.value = f.resume; coverEl.value = f.cover; linkedinEl.value = f.linkedin;
     connEl.value = f.conn; followersEl.value = f.followers; createdEl.value = f.created;
     const st = trackers.resume;
     st.pastes = key === 'fraud' ? [{ text: f.resume, len: f.resume.length, t: 0 }] : f.pastes.slice();
-    st.typedChars = f.metrics.typed_chars; st.pastedChars = f.metrics.pasted_chars;
-    st.override = f.metrics;
-    $('resumeMeta').innerHTML = 'typed <b>' + st.typedChars + '</b> · pasted <b>' + st.pastedChars + '</b>';
+    st.typedChars = f.metrics.typed_chars; st.pastedChars = f.metrics.pasted_chars; st.override = f.metrics;
+    Object.assign(pdfState, f.pdf);
+    drop.classList.add('done'); $('dropBig').textContent = 'Read ' + f.pdf.filename; $('dropSmall').textContent = f.pdf.pages + ' page' + (f.pdf.pages > 1 ? 's' : '') + ' · Experience section found · producer: LinkedIn';
+    $('reviewTitle').textContent = 'Review extracted text (' + f.linkedin.length + ' chars)'; $('howto').open = false;
+    $('l1Next').disabled = false;
     renderProvenance();
-    clearResult();
-    log('Loaded fixture ' + f.id + ' (' + f.name + '): ' + (key === 'fraud' ? 'resume pasted as one block' : 'resume built incrementally over 23 min'), 'info');
+    selectProvider('demo');
+    go('l1');
   }
+
+  // ---------- provider picker ----------
+  function selectProvider(p) {
+    provider = p;
+    document.querySelectorAll('.model').forEach(b => b.classList.toggle('sel', b.dataset.p === p));
+    keyrow.hidden = p === 'demo';
+    if (p !== 'demo') {
+      modelEl.value = sessionStorage.getItem('tf.stage2.model.' + p) || PROVIDERS[p].model;
+      apikeyEl.value = sessionStorage.getItem('tf.stage2.key.' + p) || '';
+      llmNote.innerHTML = 'Calls <code>' + PROVIDERS[p].label + '</code> directly from this browser. The key is kept in <code>sessionStorage</code> for this tab and never written anywhere else.';
+    } else llmNote.textContent = 'Demo mode replays a pre-computed cross-check for the two demo candidates. Pick a provider and paste a key to check any text for real.';
+  }
+  document.querySelectorAll('.model').forEach(b => b.addEventListener('click', () => selectProvider(b.dataset.p)));
+  apikeyEl.addEventListener('input', () => { if (provider !== 'demo') sessionStorage.setItem('tf.stage2.key.' + provider, apikeyEl.value); });
+  modelEl.addEventListener('input', () => { if (provider !== 'demo') sessionStorage.setItem('tf.stage2.model.' + provider, modelEl.value); });
 
   // ---------- run ----------
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
-
+  const sleep = ms => new Promise(r => setTimeout(r, reduceMotion ? 0 : ms));
   function readInput() {
     const num = el => el.value.trim() === '' ? null : Number(el.value);
-    return {
-      candidate_id: $('candId').value.trim() || 'UNKNOWN',
-      resume_text: resumeEl.value, cover_text: coverEl.value, linkedin_text: linkedinEl.value,
-      connections: num(connEl), followers: num(followersEl), created_year: num(createdEl)
-    };
+    return { candidate_id: $('candId').value.trim() || 'UNKNOWN', resume_text: resumeEl.value, cover_text: coverEl.value, linkedin_text: linkedinEl.value, connections: num(connEl), followers: num(followersEl), created_year: num(createdEl) };
   }
-
+  function task(n, state, v) { const t = $('t' + n); t.className = 'task ' + state; $('t' + n + 'v').textContent = v || ''; }
   async function run() {
     const input = readInput();
-    if (!input.resume_text.trim()) { log('Resume is empty, nothing to check.', 'warn'); return; }
-    runBtn.disabled = true;
-    clearResult();
+    $('runMsg').textContent = '';
+    if (!input.resume_text.trim()) { $('runMsg').textContent = 'Resume is empty. Go back to Level 1.'; return; }
+    $('runBtn').disabled = true; $('tasks').hidden = false; [1, 2, 3].forEach(n => task(n, '', ''));
     const trace = [], flags = [];
     const result = { candidate_id: input.candidate_id, status: 'running' };
-
     try {
-      // 1. provenance
-      setStage(1, 'active');
-      log('Provenance: reading typing timeline for the resume box…');
-      await sleep(350);
+      task(1, 'run'); await sleep(700);
       const m = metricsOf(trackers.resume, resumeEl);
       const prov = provenanceScore(m, trace, flags);
-      $('s-prov').textContent = prov;
-      log('Provenance score ' + prov + ': paste ratio ' + pct(m.paste_ratio) + ', rhythm cv ' + (m.rhythm_cv === null ? 'n/a' : m.rhythm_cv.toFixed(2)), prov >= 60 ? 'pass' : 'warn');
-      setStage(1, 'done');
+      task(1, prov >= 60 ? 'ok' : 'bad', prov);
 
-      // 2. claims
-      setStage(2, 'active');
-      const provider = providerEl.value;
+      task(2, 'run');
       let llm;
       if (provider === 'demo') {
-        if (!activeFixture || resumeEl.value !== FIXTURES[activeFixture].resume) {
-          throw new Error('Demo mode only knows the two fixture candidates. Pick a provider and paste a key to check custom text.');
-        }
-        log('Claims: demo mode — replaying pre-computed cross-check for ' + FIXTURES[activeFixture].id + '…');
-        await sleep(900);
-        llm = FIXTURES[activeFixture].llm;
+        if (!activeFixture || resumeEl.value !== FIXTURES[activeFixture].resume) throw new Error('Demo mode only knows the two demo candidates. Pick ChatGPT, Claude or Gemini and paste a key to check your own text.');
+        await sleep(1100); llm = FIXTURES[activeFixture].llm;
       } else {
         const key = apikeyEl.value.trim(), model = modelEl.value.trim() || PROVIDERS[provider].model;
         if (!key) throw new Error('No API key for ' + PROVIDERS[provider].label + '.');
-        log('Claims: sending resume + cover letter + LinkedIn to ' + PROVIDERS[provider].label + ' (' + model + ')…');
-        const t0 = performance.now();
         llm = await callLLM(provider, model, key, input);
-        log('Claims: model replied in ' + Math.round(performance.now() - t0) + ' ms', 'info');
       }
       const claims = claimsScore(llm, trace, flags);
-      $('s-claims').textContent = claims;
-      log('Claims score ' + claims + '. ' + (llm.summary || ''), claims >= 60 ? 'pass' : 'warn');
-      setStage(2, 'done');
+      task(2, claims >= 60 ? 'ok' : 'bad', claims);
 
-      // 3. profile
-      setStage(3, 'active');
-      await sleep(350);
+      task(3, 'run'); await sleep(600);
       const prof = profileScore(input, llm, trace, flags);
-      $('s-profile').textContent = prof;
-      log('Profile plausibility ' + prof, prof >= 60 ? 'pass' : 'warn');
-      setStage(3, 'done');
+      task(3, prof >= 60 ? 'ok' : 'bad', prof);
 
-      // 4. combine
-      setStage(4, 'active');
-      await sleep(300);
       const total = Math.round(WEIGHTS.provenance * prov + WEIGHTS.claims * claims + WEIGHTS.profile * prof);
       const status = total >= GATE ? 'cleared' : 'flagged';
       Object.assign(result, {
-        stage2_consistency_score: total,
-        status,
-        stage_cleared: total >= GATE,
+        stage2_consistency_score: total, status, stage_cleared: total >= GATE,
         breakdown: {
           provenance: { score: prov, weight: WEIGHTS.provenance, signals: stripTimeline(m) },
           claims: { score: claims, weight: WEIGHTS.claims, positions_matched: (llm.matches || []).filter(x => x.title_verdict !== 'inflated' && x.date_verdict !== 'mismatch').length, positions_total: (llm.resume_positions || []).length, summary: llm.summary || '' },
-          profile: { score: prof, weight: WEIGHTS.profile, signals: { connections: input.connections, followers: input.followers, created_year: input.created_year } }
+          profile: { score: prof, weight: WEIGHTS.profile, signals: { connections: input.connections, followers: input.followers, created_year: input.created_year, linkedin_source: pdfState.source, pdf_pages: pdfState.pages || null, pdf_producer: pdfState.producer } }
         },
-        stage2_flags: flags,
-        trace,
+        stage2_flags: flags, trace,
         model: provider === 'demo' ? 'demo-fixture' : (modelEl.value.trim() || PROVIDERS[provider].model),
         computed_at: new Date().toISOString()
       });
-      renderResult(result);
-      log('Stage 2 complete. Consistency Score: ' + total + ' (' + status + ')', status === 'cleared' ? 'pass' : 'warn');
-      setStage(4, 'done');
       try { localStorage.setItem('trustfunnel.stage2.' + input.candidate_id, JSON.stringify(result)); } catch (e) {}
       window.TrustFunnelStage2 = result;
+      await sleep(500);
+      renderResult(result); go('result');
     } catch (err) {
-      log('Error: ' + err.message, 'warn');
+      $('runMsg').textContent = err.message;
+      [1, 2, 3].forEach(n => { if ($('t' + n).classList.contains('run')) task(n, 'bad', ''); });
       result.status = 'error'; result.error = err.message;
-      jsonOut.textContent = JSON.stringify(result, null, 2);
-      dots.forEach(d => d.classList.remove('active'));
-    } finally {
-      runBtn.disabled = false;
-    }
+    } finally { $('runBtn').disabled = false; }
   }
-
-  function stripTimeline(m) { const c = Object.assign({}, m); delete c.timeline; c.rhythm_cv = c.rhythm_cv === null ? null : +c.rhythm_cv.toFixed(2); c.hold_cv = c.hold_cv === null ? null : +c.hold_cv.toFixed(2); c.paste_ratio = +c.paste_ratio.toFixed(2); c.largest_paste_ratio = +c.largest_paste_ratio.toFixed(2); c.backspace_ratio = +c.backspace_ratio.toFixed(2); return c; }
+  function stripTimeline(m) { const c = Object.assign({}, m); delete c.timeline; ['rhythm_cv', 'hold_cv'].forEach(k => c[k] = c[k] === null ? null : +c[k].toFixed(2)); ['paste_ratio', 'largest_paste_ratio', 'backspace_ratio'].forEach(k => c[k] = +c[k].toFixed(2)); return c; }
 
   function renderResult(r) {
-    bigScore.classList.remove('unset');
-    bigNum.textContent = r.stage2_consistency_score;
-    bigStatus.textContent = r.status; bigStatus.className = 'status ' + r.status;
-    bigScore.style.color = r.status === 'cleared' ? '' : 'var(--red)';
-    flagsEl.innerHTML = '';
-    if (!r.stage2_flags.length) flagsEl.innerHTML = '<div class="flag-empty">No flags: resume, cover letter and LinkedIn agree.</div>';
+    const num = $('bigNum'), target = r.stage2_consistency_score;
+    num.className = 'num' + (r.status === 'cleared' ? '' : ' low');
+    $('bigStatus').textContent = r.status.toUpperCase(); $('bigStatus').className = 'status ' + r.status;
+    $('bigSub').textContent = r.status === 'cleared' ? 'Clears the ' + GATE + ' bar. Stage 3 unlocked.' : 'Below the ' + GATE + ' bar. Stays visible to the recruiter, but flagged.';
+    if (reduceMotion) num.textContent = target;
+    else { let v = 0; const t0 = performance.now(); (function tick(now) { const p = Math.min(1, (now - t0) / 900); v = Math.round(target * (1 - Math.pow(1 - p, 3))); num.textContent = v; if (p < 1) requestAnimationFrame(tick); })(t0); }
+    const b = r.breakdown;
+    [['prov', b.provenance.score], ['claims', b.claims.score], ['profile', b.profile.score]].forEach(([k, v]) => {
+      $('s-' + k).textContent = v; const f = $('f-' + k); f.className = 'fill' + (v < 60 ? ' low' : ''); requestAnimationFrame(() => f.style.width = v + '%');
+    });
+    const fl = $('flags'); fl.innerHTML = '';
+    if (!r.stage2_flags.length) fl.innerHTML = '<div class="flag-empty">No findings. Resume, cover letter and LinkedIn agree.</div>';
     r.stage2_flags.forEach(f => {
-      const d = document.createElement('div');
-      d.className = 'flag ' + f.severity;
+      const d = document.createElement('div'); d.className = 'flag ' + f.severity;
       const ev = f.evidence && (f.evidence.a || f.evidence.b) ? ('“' + (f.evidence.a.quote || '') + '” vs “' + (f.evidence.b.quote || '') + '”') : '';
       d.innerHTML = '<i></i><div><code>' + f.code + '</code><span></span>' + (ev ? '<div class="ev"></div>' : '') + '</div>';
-      d.querySelector('span').textContent = f.message;
-      if (ev) d.querySelector('.ev').textContent = ev;
-      flagsEl.appendChild(d);
+      d.querySelector('span').textContent = f.message; if (ev) d.querySelector('.ev').textContent = ev;
+      fl.appendChild(d);
     });
-    traceEl.innerHTML = '';
-    r.trace.forEach(t => {
-      const d = document.createElement('div');
-      d.className = 'tr';
-      const cls = t.delta > 0 ? 'plus' : t.delta === 0 ? 'zero' : '';
-      d.innerHTML = '<span class="s"></span><span></span><span class="d ' + cls + '">' + (t.delta > 0 ? '+' : '') + t.delta + '</span>';
-      d.children[0].textContent = t.signal; d.children[1].textContent = t.value;
-      traceEl.appendChild(d);
-    });
-    jsonOut.textContent = JSON.stringify(r, null, 2);
+    const tr = $('trace'); tr.innerHTML = '';
+    r.trace.forEach(t => { const d = document.createElement('div'); d.className = 'tr'; d.innerHTML = '<span class="s"></span><span></span><span class="d ' + (t.delta === 0 ? 'zero' : '') + '">' + (t.delta > 0 ? '+' : '') + t.delta + '</span>'; d.children[0].textContent = t.signal; d.children[1].textContent = t.value; tr.appendChild(d); });
+    $('jsonOut').textContent = JSON.stringify(r, null, 2);
   }
 
-  function clearResult() {
-    ['s-prov', 's-claims', 's-profile'].forEach(id => $(id).textContent = '—');
-    bigScore.classList.add('unset'); bigScore.style.color = '';
-    bigNum.textContent = '—'; bigStatus.textContent = 'not_started'; bigStatus.className = 'status';
-    flagsEl.innerHTML = '<div class="flag-empty">None yet.</div>';
-    traceEl.innerHTML = '<div class="flag-empty">Run the check to see the math.</div>';
-    jsonOut.textContent = '{ "status": "not_started" }';
-    dots.forEach(d => d.classList.remove('active', 'done'));
-    labels.forEach((l, i) => l.classList.toggle('current', i === 0));
-  }
-
-  function setStage(n, state) {
-    dots.forEach(d => d.classList.remove('active'));
-    labels.forEach(l => l.classList.remove('current'));
-    if (state === 'active') { dots[n - 1].classList.add('active'); labels[n - 1].classList.add('current'); }
-    if (state === 'done') { dots[n - 1].classList.add('done'); if (n < 4) labels[n].classList.add('current'); }
-  }
-
-  function log(msg, kind) {
-    kind = kind || 'info';
-    const t = new Date();
-    const ts = String(t.getMinutes()).padStart(2, '0') + ':' + String(t.getSeconds()).padStart(2, '0');
-    const row = document.createElement('div');
-    row.className = 'row ' + kind;
-    row.innerHTML = '<span class="t">' + ts + '</span><span class="m"></span>';
-    row.querySelector('.m').textContent = msg;
-    logFeed.appendChild(row);
-    logFeed.scrollTop = logFeed.scrollHeight;
-  }
-
-  // ---------- provider / key handling ----------
-  function syncProvider() {
-    const p = providerEl.value;
-    const isDemo = p === 'demo';
-    modelEl.disabled = isDemo; apikeyEl.disabled = isDemo;
-    if (!isDemo) {
-      modelEl.value = sessionStorage.getItem('tf.stage2.model.' + p) || PROVIDERS[p].model;
-      apikeyEl.value = sessionStorage.getItem('tf.stage2.key.' + p) || '';
-      llmNote.innerHTML = 'Calls <code>' + PROVIDERS[p].label + '</code> directly from this browser with your key. The key is kept in <code>sessionStorage</code> for this tab only and is never written to the repo or any server of ours.';
-    } else {
-      modelEl.value = ''; apikeyEl.value = '';
-      llmNote.innerHTML = 'Demo mode replays a pre-computed cross-check for the two fixture candidates. Pick a provider and paste a key to run the real thing on any text. Keys live in <code>sessionStorage</code> and never leave this browser except to the provider you chose.';
-    }
-  }
-  providerEl.addEventListener('change', syncProvider);
-  apikeyEl.addEventListener('input', () => { if (providerEl.value !== 'demo') sessionStorage.setItem('tf.stage2.key.' + providerEl.value, apikeyEl.value); });
-  modelEl.addEventListener('input', () => { if (providerEl.value !== 'demo') sessionStorage.setItem('tf.stage2.model.' + providerEl.value, modelEl.value); });
-
-  // ---------- wiring ----------
-  runBtn.addEventListener('click', run);
-  $('demoHonestBtn').addEventListener('click', () => loadFixture('honest'));
-  $('demoFraudBtn').addEventListener('click', () => loadFixture('fraud'));
-  resetBtn.addEventListener('click', () => {
+  function resetAll() {
     activeFixture = null;
     [resumeEl, coverEl, linkedinEl, connEl, followersEl, createdEl].forEach(el => el.value = '');
-    const fresh = makeTracker(resumeEl, $('resumeMeta'));
     Object.assign(trackers.resume, { typedChars: 0, pastedChars: 0, backspaces: 0, pastes: [], ikis: [], holds: [], pauses: 0, lastKeyT: null, startT: null, timeline: [], override: null });
-    void fresh;
-    $('resumeMeta').innerHTML = 'typed <b>0</b> · pasted <b>0</b>';
-    $('coverMeta').innerHTML = 'typed <b>0</b> · pasted <b>0</b>';
+    Object.assign(pdfState, { source: 'none', filename: null, pages: 0, producer: null });
+    drop.classList.remove('done'); $('dropBig').textContent = 'Drop your LinkedIn PDF here'; $('dropSmall').innerHTML = 'or click to choose a file · usually named <span class="mono">Profile.pdf</span>';
+    $('reviewTitle').textContent = 'Review extracted text · or paste your Experience section instead'; $('reviewBox').open = false; $('howto').open = true;
+    $('tasks').hidden = true; $('runMsg').textContent = ''; $('pdfMsg').textContent = ''; $('l1Next').disabled = true;
+    window.TrustFunnelStage2 = null; pdfFile.value = '';
     renderProvenance();
-    clearResult();
-    logFeed.innerHTML = '';
-    log('Reset. Waiting for input…');
-  });
-  copyBtn.addEventListener('click', () => {
-    navigator.clipboard.writeText(jsonOut.textContent).then(() => { copyBtn.textContent = 'Copied'; setTimeout(() => copyBtn.textContent = 'Copy JSON', 1200); });
-  });
-  exportBtn.addEventListener('click', () => {
-    if (!window.TrustFunnelStage2) { log('Nothing to save yet, run the check first.', 'warn'); return; }
-    try {
-      localStorage.setItem('trustfunnel.stage2.' + window.TrustFunnelStage2.candidate_id, JSON.stringify(window.TrustFunnelStage2));
-      log('Saved to localStorage["trustfunnel.stage2.' + window.TrustFunnelStage2.candidate_id + '"]', 'pass');
-    } catch (e) { log('localStorage unavailable: ' + e.message, 'warn'); }
-  });
-  window.addEventListener('resize', () => renderProvenance());
-  document.addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') run();
-  });
+  }
 
-  syncProvider();
-  renderProvenance();
+  // ---------- wiring ----------
+  $('startBtn').addEventListener('click', () => go('l1'));
+  $('demoHonestBtn').addEventListener('click', () => loadFixture('honest'));
+  $('demoFraudBtn').addEventListener('click', () => loadFixture('fraud'));
+  $('l1Next').addEventListener('click', () => go('l2'));
+  $('l2Next').addEventListener('click', () => go('l3'));
+  $('runBtn').addEventListener('click', run);
+  $('againBtn').addEventListener('click', () => { resetAll(); go('intro'); });
+  $('handoffBtn').addEventListener('click', () => {
+    const r = window.TrustFunnelStage2; if (!r) return;
+    try { localStorage.setItem('trustfunnel.stage2.' + r.candidate_id, JSON.stringify(r)); } catch (e) {}
+    $('handoffBtn').textContent = 'Saved for Stage 3 ✓'; setTimeout(() => $('handoffBtn').textContent = 'Send to Stage 3 →', 1500);
+  });
+  $('copyBtn').addEventListener('click', () => navigator.clipboard.writeText($('jsonOut').textContent).then(() => { $('copyBtn').textContent = 'Copied'; setTimeout(() => $('copyBtn').textContent = 'Copy JSON', 1200); }));
+  $('exportBtn').addEventListener('click', () => { const r = window.TrustFunnelStage2; if (!r) return; try { localStorage.setItem('trustfunnel.stage2.' + r.candidate_id, JSON.stringify(r)); $('exportBtn').textContent = 'Saved'; setTimeout(() => $('exportBtn').textContent = 'Save to localStorage', 1200); } catch (e) {} });
+  window.addEventListener('resize', () => renderProvenance());
+  document.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && document.querySelector('.screen.on').dataset.screen === 'l3') run(); });
+  selectProvider('demo');
 })();
 </script>
 </body>
