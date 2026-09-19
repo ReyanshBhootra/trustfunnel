@@ -142,6 +142,8 @@
   .drop.done { border-style: solid; border-color: var(--green); }
   .drop.done .big { color: var(--green); }
 
+  .howto-list { margin: 0 0 10px; padding-left: 20px; font-size: 13.5px; line-height: 1.7; color: var(--text-dim); }
+  .howto-list b { color: var(--text); font-weight: 600; }
   /* tutorial */
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   @media (max-width: 620px) { .steps { grid-template-columns: 1fr; } }
@@ -307,64 +309,16 @@
       <div class="msg" id="pdfMsg"></div>
     </div>
 
-    <details id="howto" open>
-      <summary>How do I get this PDF? (3 steps, 20 seconds)</summary>
+    <details id="howto">
+      <summary>Where do I get this PDF?</summary>
       <div class="body">
-        <div class="steps">
-          <div class="step">
-            <div class="fig">
-              <svg viewBox="0 0 320 190" role="img" aria-label="LinkedIn profile header with the More button highlighted">
-                <rect width="320" height="190" fill="#0c0e13"/>
-                <rect x="0" y="0" width="320" height="52" fill="#1d222d"/>
-                <circle cx="46" cy="64" r="26" fill="#2a2f3c" stroke="#0c0e13" stroke-width="4"/>
-                <rect x="20" y="102" width="120" height="10" rx="3" fill="#8b92a5"/>
-                <rect x="20" y="118" width="180" height="7" rx="3" fill="#3a4050"/>
-                <rect x="20" y="131" width="90" height="7" rx="3" fill="#3a4050"/>
-                <rect x="20" y="152" width="64" height="20" rx="10" fill="#5b93d9"/>
-                <rect x="90" y="152" width="94" height="20" rx="10" fill="none" stroke="#5b93d9"/>
-                <rect x="190" y="152" width="52" height="20" rx="10" fill="none" stroke="#8b92a5"/>
-                <text x="216" y="166" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="#edeff4" text-anchor="middle">More ▾</text>
-                <rect x="185" y="147" width="62" height="30" rx="15" fill="none" stroke="#c9a24b" stroke-width="2.5"/>
-              </svg>
-            </div>
-            <div class="cap"><b>1.</b> Open your own profile on linkedin.com and click <b>More</b> under your headline (on some accounts it sits under <b>Resources</b>).</div>
-          </div>
-          <div class="step">
-            <div class="fig">
-              <svg viewBox="0 0 320 190" role="img" aria-label="More menu open with Save to PDF highlighted">
-                <rect width="320" height="190" fill="#0c0e13"/>
-                <rect x="0" y="0" width="320" height="52" fill="#1d222d"/>
-                <rect x="20" y="70" width="120" height="10" rx="3" fill="#8b92a5"/>
-                <rect x="20" y="86" width="180" height="7" rx="3" fill="#3a4050"/>
-                <rect x="190" y="106" width="52" height="20" rx="10" fill="#2a2f3c"/>
-                <text x="216" y="120" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="#edeff4" text-anchor="middle">More ▾</text>
-                <rect x="150" y="130" width="150" height="56" rx="6" fill="#1d222d" stroke="#2a2f3c"/>
-                <text x="162" y="147" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="#8b92a5">Send profile in a message</text>
-                <rect x="153" y="154" width="144" height="18" rx="4" fill="#2a2f3c"/>
-                <text x="162" y="166" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="600" fill="#edeff4">Save to PDF</text>
-                <rect x="151" y="152" width="148" height="22" rx="5" fill="none" stroke="#c9a24b" stroke-width="2.5"/>
-                <text x="162" y="182" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="#8b92a5">Build a resume</text>
-              </svg>
-            </div>
-            <div class="cap"><b>2.</b> Choose <b>Save to PDF</b>. LinkedIn downloads a file with your headline, experience and education.</div>
-          </div>
-          <div class="step">
-            <div class="fig">
-              <svg viewBox="0 0 320 190" role="img" aria-label="Uploading the PDF file into the dropzone">
-                <rect width="320" height="190" fill="#0c0e13"/>
-                <rect x="40" y="40" width="70" height="90" rx="6" fill="#1d222d" stroke="#3a4050"/>
-                <path d="M88 40 L110 62 L88 62 Z" fill="#3a4050"/>
-                <text x="75" y="105" font-family="IBM Plex Mono, monospace" font-size="11" fill="#edeff4" text-anchor="middle">PDF</text>
-                <path d="M122 85 L178 85" stroke="#c9a24b" stroke-width="2.5"/>
-                <path d="M170 77 L180 85 L170 93" fill="none" stroke="#c9a24b" stroke-width="2.5"/>
-                <rect x="190" y="45" width="100" height="80" rx="8" fill="none" stroke="#c9a24b" stroke-width="2" stroke-dasharray="6 5"/>
-                <path d="M240 68 L240 100 M228 80 L240 68 L252 80" fill="none" stroke="#edeff4" stroke-width="2.5"/>
-                <text x="240" y="150" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="#8b92a5" text-anchor="middle">Drop it in the box above</text>
-              </svg>
-            </div>
-            <div class="cap"><b>3.</b> Drop that file in the box above. We pull out the Experience section; you can review it before moving on.</div>
-          </div>
-        </div>
+        <ol class="howto-list">
+          <li>Go to <b>linkedin.com</b> and open <b>your own profile</b> (click your photo, then "View profile").</li>
+          <li>Under your headline, click <b>More</b>. On some accounts the button is called <b>Resources</b>.</li>
+          <li>Choose <b>Save to PDF</b>. LinkedIn downloads a file with your headline, experience and education, usually named <span class="mono">Profile.pdf</span>.</li>
+          <li>Drop that file in the box above. Nothing is uploaded: it is read here in your browser.</li>
+        </ol>
+        <div class="note">No PDF handy? Open "Review extracted text" below and paste the Experience section from your profile instead.</div>
       </div>
     </details>
 
@@ -630,7 +584,7 @@
       $('dropBig').textContent = 'Read ' + file.name;
       $('dropSmall').textContent = pdf.numPages + ' page' + (pdf.numPages > 1 ? 's' : '') + (exp ? ' · Experience section found' + (roles ? ' (' + roles + ' role' + (roles > 1 ? 's' : '') + ')' : '') : ' · no Experience heading, using full text') + (pdfState.producer ? ' · producer: ' + pdfState.producer : '');
       $('reviewTitle').textContent = 'Review extracted text (' + linkedinEl.value.length + ' chars)';
-      $('reviewBox').open = true; $('howto').open = false;
+      $('reviewBox').open = true;
     } catch (err) {
       drop.classList.remove('done'); $('dropBig').textContent = 'Drop your LinkedIn PDF here';
       pdfMsg.textContent = 'Could not read that PDF: ' + err.message + '. Paste your Experience section below instead.';
@@ -815,7 +769,7 @@ Working on internal dashboards.`,
     st.typedChars = f.metrics.typed_chars; st.pastedChars = f.metrics.pasted_chars; st.override = f.metrics;
     Object.assign(pdfState, f.pdf);
     drop.classList.add('done'); $('dropBig').textContent = 'Read ' + f.pdf.filename; $('dropSmall').textContent = f.pdf.pages + ' page' + (f.pdf.pages > 1 ? 's' : '') + ' · Experience section found · producer: LinkedIn';
-    $('reviewTitle').textContent = 'Review extracted text (' + f.linkedin.length + ' chars)'; $('howto').open = false;
+    $('reviewTitle').textContent = 'Review extracted text (' + f.linkedin.length + ' chars)';
     $('l1Next').disabled = false;
     renderProvenance();
     selectProvider('demo');
@@ -860,7 +814,10 @@ Working on internal dashboards.`,
       task(2, 'run');
       let llm;
       if (provider === 'demo') {
-        if (!activeFixture || resumeEl.value !== FIXTURES[activeFixture].resume) throw new Error('Demo mode only knows the two demo candidates. Pick ChatGPT, Claude or Gemini and paste a key to check your own text.');
+        if (!activeFixture || resumeEl.value !== FIXTURES[activeFixture].resume) {
+          selectProvider('openai'); apikeyEl.focus();
+          throw new Error('This is new data, so a model has to read it. Paste an API key for ChatGPT, Claude or Gemini above and run again.');
+        }
         await sleep(1100); llm = FIXTURES[activeFixture].llm;
       } else {
         const key = apikeyEl.value.trim(), model = modelEl.value.trim() || PROVIDERS[provider].model;
@@ -884,6 +841,7 @@ Working on internal dashboards.`,
           profile: { score: prof, weight: WEIGHTS.profile, signals: { connections: input.connections, followers: input.followers, created_year: input.created_year, linkedin_source: pdfState.source, pdf_pages: pdfState.pages || null, pdf_producer: pdfState.producer } }
         },
         stage2_flags: flags, trace,
+        stage3_handoff: stage3Handoff(input, llm, total, status, flags),
         model: provider === 'demo' ? 'demo-fixture' : (modelEl.value.trim() || PROVIDERS[provider].model),
         computed_at: new Date().toISOString()
       });
@@ -896,6 +854,19 @@ Working on internal dashboards.`,
       [1, 2, 3].forEach(n => { if ($('t' + n).classList.contains('run')) task(n, 'bad', ''); });
       result.status = 'error'; result.error = err.message;
     } finally { $('runBtn').disabled = false; }
+  }
+  // Shape Stage 3 (stage3/app/models.py) expects: StageScore + CandidateProfile.
+  function stage3Handoff(input, llm, total, status, flags) {
+    const verifiedCos = new Set((llm.matches || []).filter(m => m.title_verdict !== 'inflated' && m.date_verdict !== 'mismatch').map(m => norm(m.company)));
+    const years = (p) => { const y = s => { const m = String(s || '').match(/(19|20)\d{2}/); return m ? +m[0] : null; }; const a = y(p.start), b = /present/i.test(p.end || '') ? new Date().getFullYear() : y(p.end); return a && b ? Math.max(0, b - a) : 0; };
+    const experience = (llm.resume_positions || []).map(p => ({ title: p.title || '', company: p.company || '', summary: (p.title || '') + ' at ' + (p.company || ''), years: years(p), verified: verifiedCos.has(norm(p.company || '')) }));
+    const skillsLine = (input.resume_text.match(/skills?\s*[:：]\s*(.+)/i) || [])[1] || '';
+    const skills = skillsLine.split(/[,•|]/).map(x => x.trim()).filter(x => x && x.length < 40).map(name => ({ name, verified: false, years: 0 }));
+    const name = (input.resume_text.split('\n')[0] || '').split(/[—–-]/)[0].trim().slice(0, 60);
+    return {
+      stage_score: { score: total, status: status === 'cleared' ? 'cleared' : 'failed', flags: flags.map(f => f.code) },
+      candidate_profile: { candidate_id: input.candidate_id, name, skills, experience, years_experience: experience.reduce((a, e) => a + e.years, 0), applications_last_30d: 0, application_history: [], burst_ratio: 0 }
+    };
   }
   function stripTimeline(m) { const c = Object.assign({}, m); delete c.timeline; ['rhythm_cv', 'hold_cv'].forEach(k => c[k] = c[k] === null ? null : +c[k].toFixed(2)); ['paste_ratio', 'largest_paste_ratio', 'backspace_ratio'].forEach(k => c[k] = +c[k].toFixed(2)); return c; }
 
@@ -930,7 +901,7 @@ Working on internal dashboards.`,
     Object.assign(trackers.resume, { typedChars: 0, pastedChars: 0, backspaces: 0, pastes: [], ikis: [], holds: [], pauses: 0, lastKeyT: null, startT: null, timeline: [], override: null });
     Object.assign(pdfState, { source: 'none', filename: null, pages: 0, producer: null });
     drop.classList.remove('done'); $('dropBig').textContent = 'Drop your LinkedIn PDF here'; $('dropSmall').innerHTML = 'or click to choose a file · usually named <span class="mono">Profile.pdf</span>';
-    $('reviewTitle').textContent = 'Review extracted text · or paste your Experience section instead'; $('reviewBox').open = false; $('howto').open = true;
+    $('reviewTitle').textContent = 'Review extracted text · or paste your Experience section instead'; $('reviewBox').open = false;
     $('tasks').hidden = true; $('runMsg').textContent = ''; $('pdfMsg').textContent = ''; $('l1Next').disabled = true;
     window.TrustFunnelStage2 = null; pdfFile.value = '';
     renderProvenance();

@@ -6,7 +6,7 @@ Game-style flow: **Intro → Level 1 Resume → Level 2 LinkedIn → Level 3 Cro
 
 ## What it does
 1. **Provenance** — records typing rhythm and paste events in the resume box (timing only, never key identity). Paragraphs are colored green = typed, gold = mixed, red = pasted. Signals: `paste_ratio`, `largest_paste_ratio`, `rhythm_cv`, `backspace_ratio`, `think_pauses`.
-2. **LinkedIn PDF** — the candidate uploads the PDF LinkedIn generates from their own profile (Profile → More → Save to PDF; illustrated 3-step guide is on the page). pdf.js reads it in the browser, the Experience section is extracted and shown for review. Fallback: paste the Experience text. No scraping, nothing uploaded anywhere.
+2. **LinkedIn PDF** — the candidate uploads the PDF LinkedIn generates from their own profile (Profile → More → Save to PDF; the steps are written on the page). pdf.js reads it in the browser, the Experience section is extracted and shown for review. Fallback: paste the Experience text. No scraping, nothing uploaded anywhere.
 3. **Claim cross-check** — resume + cover letter + the extracted LinkedIn Experience are sent as one set to ChatGPT / Claude / Gemini (bring your own key, kept in `sessionStorage`). Returns positions on each side, inflated titles, date mismatches, contradictions with quotes. **Demo mode** replays a pre-computed result for the two fixture candidates so the stage demo never depends on network.
 4. **Profile plausibility** — local rules on self-reported connections / followers / profile-created year.
 5. **Score** — `0.30·provenance + 0.50·claims + 0.20·profile`, `>= 60` clears Stage 2.
@@ -29,6 +29,10 @@ Written to `localStorage["trustfunnel.stage2.<candidate_id>"]`, `window.TrustFun
   },
   "stage2_flags": [ { "code": "TITLE_INFLATED", "severity": "high", "message": "...", "evidence": {} } ],
   "trace": [ { "signal": "paste_ratio", "value": "98%", "delta": -59 } ],
+  "stage3_handoff": {                  // exactly the shape stage3/app/models.py wants
+    "stage_score": { "score": 22, "status": "failed", "flags": ["PASTED_BLOCK", "TITLE_INFLATED"] },
+    "candidate_profile": { "candidate_id": "DEMO-0177", "name": "Felix Marlow", "skills": [{ "name": "Kubernetes", "verified": false, "years": 0 }], "experience": [{ "title": "Senior Staff Software Engineer", "company": "Acme Cloud", "summary": "...", "years": 5, "verified": false }], "years_experience": 7, "applications_last_30d": 0, "application_history": [], "burst_ratio": 0 }
+  },
   "model": "demo-fixture",
   "computed_at": "2026-09-19T18:00:00.000Z"
 }
@@ -40,7 +44,7 @@ Flag codes: `PASTED_BLOCK`, `UNIFORM_TYPING`, `TITLE_INFLATED`, `DATE_MISMATCH`,
 1. **Play demo: honest** → Next → Next → **Run the check** → three tasks tick green → 95, CLEARED, no findings.
 2. **Check another candidate** → **Play demo: fraud** → Level 1 map is all red → Next → Next → **Run** → 22, FLAGGED: 98% pasted in one block, Intern on LinkedIn vs Senior Staff on resume, cover letter says six years vs a three-month internship, 12 connections, profile created this year.
 3. Optional live moment: **Start**, type two lines, then paste a paragraph and watch it turn red. On Level 2 drop a real LinkedIn PDF and open "Review extracted text".
-4. With a real key: on Level 3 pick ChatGPT / Claude / Gemini and run on any text.
+4. New data (anything that is not one of the two fixtures) needs a model: the page switches to the provider picker and asks for a key. Keys stay in `sessionStorage`.
 
 ## Fixtures
 `DEMO-0142` Hana Ortiz (honest) and `DEMO-0177` Felix Marlow (fraud) live in the `FIXTURES` object near the bottom of `index.html`; edit there to change names or scores.
