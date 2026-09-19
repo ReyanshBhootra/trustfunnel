@@ -1,6 +1,6 @@
 # Stage 2 — Resume & Profile Consistency
 
-Single HTML file, no backend, no extension. Open `stage2-consistency/index.html` (or serve the repo with any static server).
+Single HTML file, no backend, no extension. Lives in `public/stage2/` so the Vite app serves it at `/stage2/index.html` (`npm run dev` → http://localhost:5173/stage2/index.html). The dashboard's candidate flow links to it as "Open live consistency check".
 
 Game-style flow: **Intro → Level 1 Resume → Level 2 LinkedIn → Level 3 Cross-check → Result** with a progress bar in the header. "Play demo: honest / fraud" on the intro loads a fixture candidate and walks the same levels.
 
@@ -47,4 +47,4 @@ Flag codes: `PASTED_BLOCK`, `UNIFORM_TYPING`, `TITLE_INFLATED`, `DATE_MISMATCH`,
 4. New data (anything that is not one of the two fixtures) needs a model: the page switches to the provider picker and asks for a key. Keys stay in `sessionStorage`.
 
 ## Fixtures
-`DEMO-0142` Hana Ortiz (honest) and `DEMO-0177` Felix Marlow (fraud) live in the `FIXTURES` object near the bottom of `index.html`; edit there to change names or scores.
+`DEMO-0142` Hana Ortiz (honest) and `DEMO-0177` Felix Marlow (fraud) live in the `FIXTURES` object near the bottom of `public/stage2/index.html`; edit there to change names or scores.
