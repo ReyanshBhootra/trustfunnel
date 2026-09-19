@@ -128,6 +128,9 @@ export default function CandidateFlow({ onShowInQueue }) {
         <a className="live-link" href="/identity.html" target="_blank" rel="noreferrer">
           Open live camera module ↗
         </a>
+        <a className="live-link" href="/stage2/index.html" target="_blank" rel="noreferrer">
+          Open live consistency check ↗
+        </a>
       </aside>
     </div>
   );
