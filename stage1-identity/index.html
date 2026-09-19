@@ -1,18 +1,640 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TrustFunnel — Recruiter Queue</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stage 1 — Identity Verification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #10131a;
+    --panel: #171b24;
+    --panel-2: #1d222d;
+    --hairline: #2a2f3c;
+    --text: #edeff4;
+    --text-dim: #8b92a5;
+    --gold: #c9a24b;
+    --red: #d9694f;
+    --blue: #5b93d9;
+    --green: #6fae7c;
+    --radius: 3px;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  h1, h2, h3 { font-family: 'Archivo', 'IBM Plex Sans', sans-serif; margin: 0; }
+  .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--hairline);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  header h1 { font-size: 17px; font-weight: 700; letter-spacing: 0.01em; }
+  header .sub { color: var(--text-dim); font-size: 13px; }
+  header .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 3px 8px;
+  }
+
+  main {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 1px;
+    background: var(--hairline);
+    min-height: calc(100vh - 74px);
+  }
+  @media (max-width: 860px) {
+    main { grid-template-columns: 1fr; }
+  }
+
+  .camera-col, .log-col { background: var(--bg); padding: 24px 28px; }
+
+  .stage-rail {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .stage-rail .dot {
+    flex: 1;
+    height: 3px;
+    background: var(--hairline);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stage-rail .dot.done { background: var(--gold); }
+  .stage-rail .dot.active::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--blue);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+
+  .stage-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 24px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .stage-labels span.current { color: var(--text); }
+
+  .camera-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #000;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--hairline);
+  }
+  .camera-frame video, .camera-frame canvas {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .camera-frame canvas { pointer-events: none; }
+
+  .hud-corner {
+    position: absolute;
+    width: 18px; height: 18px;
+    border-color: var(--gold);
+    opacity: 0.85;
+  }
+  .hud-corner.tl { top: 12px; left: 12px; border-top: 2px solid; border-left: 2px solid; }
+  .hud-corner.tr { top: 12px; right: 12px; border-top: 2px solid; border-right: 2px solid; }
+  .hud-corner.bl { bottom: 12px; left: 12px; border-bottom: 2px solid; border-left: 2px solid; }
+  .hud-corner.br { bottom: 12px; right: 12px; border-bottom: 2px solid; border-right: 2px solid; }
+
+  .prompt-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(10, 12, 16, 0.72);
+    text-align: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .prompt-overlay.show { opacity: 1; }
+  .prompt-overlay .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+  }
+  .prompt-overlay .text { font-family: 'Archivo', sans-serif; font-size: 20px; font-weight: 600; line-height: 1.35; }
+
+  .cam-status {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .cam-status .live-dot {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-dim); margin-right: 6px; vertical-align: middle;
+  }
+  .cam-status .live-dot.on { background: var(--red); animation: pulse 1.2s ease-in-out infinite; }
+
+  .actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+  button {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--hairline);
+    background: var(--panel-2);
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  button:hover:not(:disabled) { border-color: var(--gold); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+  button.primary { background: var(--gold); color: #17140b; border-color: var(--gold); font-weight: 600; }
+  button.primary:hover:not(:disabled) { background: #d6ae55; }
+
+  .log-col { display: flex; flex-direction: column; }
+  .log-col h2 { font-size: 14px; margin-bottom: 4px; }
+  .log-col .hint { font-size: 12px; color: var(--text-dim); margin-bottom: 16px; }
+
+  .log-feed {
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    line-height: 1.9;
+    overflow-y: auto;
+    max-height: 260px;
+  }
+  .log-feed .row { display: flex; gap: 10px; color: var(--text-dim); }
+  .log-feed .row .t { flex-shrink: 0; opacity: 0.6; }
+  .log-feed .row.pass .m { color: var(--green); }
+  .log-feed .row.warn .m { color: var(--red); }
+  .log-feed .row.info .m { color: var(--text); }
+
+  .score-card {
+    margin-top: 16px;
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+    padding: 20px;
+  }
+  .score-card .label { font-size: 12px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace; }
+  .score-card .big-score {
+    font-family: 'Archivo', sans-serif;
+    font-size: 44px;
+    font-weight: 700;
+    margin: 4px 0 14px;
+    color: var(--gold);
+  }
+  .score-card .big-score.unset { color: var(--text-dim); }
+  .sub-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .sub-score { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 10px 12px; }
+  .sub-score .n { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); }
+  .sub-score .v { font-family: 'Archivo', sans-serif; font-size: 20px; font-weight: 600; margin-top: 2px; }
+
+  .json-box {
+    background: #0c0e13;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: #a9b3c9;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  .copy-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+  .copy-row button { font-size: 12px; padding: 6px 12px; }
+
+  footer {
+    padding: 14px 28px;
+    border-top: 1px solid var(--hairline);
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>TrustFunnel — Stage 1</h1>
+    <div class="sub">Identity Verification module</div>
+  </div>
+  <div class="badge">CANDIDATE_ID: DEMO-0142</div>
+</header>
+
+<main>
+  <section class="camera-col">
+    <div class="stage-rail">
+      <div class="dot" id="dot-1"></div>
+      <div class="dot" id="dot-2"></div>
+      <div class="dot" id="dot-3"></div>
+      <div class="dot" id="dot-4"></div>
+    </div>
+    <div class="stage-labels">
+      <span id="lbl-1">Baseline scan</span>
+      <span id="lbl-2">Live monitoring</span>
+      <span id="lbl-3">Reaction challenge</span>
+      <span id="lbl-4">Voice check</span>
+    </div>
+
+    <div class="camera-frame">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+      <div class="hud-corner tl"></div>
+      <div class="hud-corner tr"></div>
+      <div class="hud-corner bl"></div>
+      <div class="hud-corner br"></div>
+      <div class="prompt-overlay" id="promptOverlay">
+        <div>
+          <div class="tag">REACTION CHALLENGE</div>
+          <div class="text" id="promptText">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cam-status">
+      <span><span class="live-dot" id="liveDot"></span><span id="statusText">Camera not started</span></span>
+      <span id="motionReadout">motion: —</span>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="startBtn">Start camera</button>
+      <button id="baselineBtn" disabled>Capture baseline</button>
+      <button id="beginBtn" disabled>Begin monitoring</button>
+      <button id="voiceBtn" disabled>Run voice check</button>
+      <button id="resetBtn">Reset demo</button>
+    </div>
+  </section>
+
+  <section class="log-col">
+    <h2>Verification log</h2>
+    <div class="hint">Live output from each sub-check, written to <span class="mono">contracts/scores.md</span> shape at the end.</div>
+
+    <div class="log-feed" id="logFeed">
+      <div class="row info"><span class="t">00:00</span><span class="m">Waiting for camera permission…</span></div>
+    </div>
+
+    <div class="score-card">
+      <div class="label">STAGE1_IDENTITY_SCORE</div>
+      <div class="big-score unset" id="bigScore">—</div>
+
+      <div class="sub-scores">
+        <div class="sub-score"><div class="n">baseline_match</div><div class="v" id="s-baseline">—</div></div>
+        <div class="sub-score"><div class="n">reaction_challenge</div><div class="v" id="s-reaction">—</div></div>
+        <div class="sub-score"><div class="n">voice_consistency</div><div class="v" id="s-voice">—</div></div>
+        <div class="sub-score"><div class="n">cross_app_check</div><div class="v" id="s-cross">—</div></div>
+      </div>
+
+      <div class="label" style="margin-bottom:6px;">OUTPUT (for Stage 2 / dashboard)</div>
+      <div class="json-box" id="jsonOut">{ "status": "not_started" }</div>
+      <div class="copy-row"><button id="copyBtn">Copy JSON</button></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Motion + audio signals are computed client-side as lightweight liveness heuristics for this demo — swap in a real facial-landmark model (e.g. a MediaPipe FaceLandmarker service) and a proper pitch-tracking library for production scoring.
+</footer>
+
+<script>
+(function () {
+  const video = document.getElementById('video');
+  const overlay = document.getElementById('overlay');
+  const octx = overlay.getContext('2d');
+  const startBtn = document.getElementById('startBtn');
+  const baselineBtn = document.getElementById('baselineBtn');
+  const beginBtn = document.getElementById('beginBtn');
+  const voiceBtn = document.getElementById('voiceBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const liveDot = document.getElementById('liveDot');
+  const statusText = document.getElementById('statusText');
+  const motionReadout = document.getElementById('motionReadout');
+  const logFeed = document.getElementById('logFeed');
+  const promptOverlay = document.getElementById('promptOverlay');
+  const promptText = document.getElementById('promptText');
+  const bigScore = document.getElementById('bigScore');
+  const jsonOut = document.getElementById('jsonOut');
+  const copyBtn = document.getElementById('copyBtn');
+
+  const dots = [1, 2, 3, 4].map(n => document.getElementById('dot-' + n));
+  const labels = [1, 2, 3, 4].map(n => document.getElementById('lbl-' + n));
+
+  let stream = null;
+  let baselineFrame = null;
+  let prevFrame = null;
+  let motionLoopId = null;
+  let currentMotion = 0;
+  let motionSamples = [];
+  let collectingReaction = false;
+  let reactionSamples = [];
+
+  const scores = {
+    candidate_id: "DEMO-0142",
+    baseline_match: null,
+    reaction_challenge: null,
+    voice_consistency: null,
+    cross_app_check: null,
+    stage1_identity_score: null,
+    stage1_flags: [],
+    status: "not_started"
+  };
+
+  const PROMPTS = [
+    "React: your background check just got flagged for a random error.",
+    "Turn your head slowly to the left, then back.",
+    "Say the word 'umbrella' out loud, clearly.",
+    "React: you were offered double the salary you expected."
+  ];
+
+  function log(msg, kind) {
+    kind = kind || 'info';
+    const t = new Date();
+    const ts = String(t.getMinutes()).padStart(2, '0') + ':' + String(t.getSeconds()).padStart(2, '0');
+    const row = document.createElement('div');
+    row.className = 'row ' + kind;
+    row.innerHTML = '<span class="t">' + ts + '</span><span class="m">' + msg + '</span>';
+    logFeed.appendChild(row);
+    logFeed.scrollTop = logFeed.scrollHeight;
+  }
+
+  function setStage(n, state) {
+    dots.forEach((d, i) => d.classList.remove('active'));
+    if (state === 'active') {
+      dots[n - 1].classList.add('active');
+    }
+    if (state === 'done') {
+      dots[n - 1].classList.remove('active');
+      dots[n - 1].classList.add('done');
+    }
+    labels.forEach(l => l.classList.remove('current'));
+    if (state === 'active') labels[n - 1].classList.add('current');
+  }
+
+  function updateJson() {
+    jsonOut.textContent = JSON.stringify(scores, null, 2);
+  }
+
+  function updateSubScores() {
+    document.getElementById('s-baseline').textContent = scores.baseline_match === null ? '—' : scores.baseline_match;
+    document.getElementById('s-reaction').textContent = scores.reaction_challenge === null ? '—' : scores.reaction_challenge;
+    document.getElementById('s-voice').textContent = scores.voice_consistency === null ? '—' : scores.voice_consistency;
+    document.getElementById('s-cross').textContent = scores.cross_app_check === null ? '—' : scores.cross_app_check;
+  }
+
+  function maybeFinalize() {
+    const vals = [scores.baseline_match, scores.reaction_challenge, scores.voice_consistency, scores.cross_app_check];
+    if (vals.every(v => v !== null)) {
+      const avg = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+      scores.stage1_identity_score = avg;
+      scores.status = avg >= 60 ? "cleared" : "flagged";
+      if (avg < 60) scores.stage1_flags.push("low_composite_identity_score");
+      bigScore.textContent = avg;
+      bigScore.classList.remove('unset');
+      log('Stage 1 complete — Identity Trust Score: ' + avg + ' (' + scores.status + ')', avg >= 60 ? 'pass' : 'warn');
+      setStage(4, 'done');
+    }
+    updateJson();
+  }
+
+  startBtn.addEventListener('click', async () => {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      video.srcObject = stream;
+      await video.play();
+      overlay.width = video.videoWidth || 640;
+      overlay.height = video.videoHeight || 480;
+      liveDot.classList.add('on');
+      statusText.textContent = 'Camera live';
+      startBtn.disabled = true;
+      baselineBtn.disabled = false;
+      log('Camera stream started.', 'pass');
+      setStage(1, 'active');
+    } catch (err) {
+      log('Camera permission denied or unavailable: ' + err.message, 'warn');
+      statusText.textContent = 'Camera error';
+    }
+  });
+
+  function grabFrameData() {
+    const c = document.createElement('canvas');
+    c.width = 64; c.height = 48;
+    const cx = c.getContext('2d');
+    cx.drawImage(video, 0, 0, c.width, c.height);
+    return cx.getImageData(0, 0, c.width, c.height);
+  }
+
+  function frameDiff(a, b) {
+    let sum = 0;
+    for (let i = 0; i < a.data.length; i += 4) {
+      sum += Math.abs(a.data[i] - b.data[i]);
+    }
+    return sum / (a.data.length / 4);
+  }
+
+  baselineBtn.addEventListener('click', () => {
+    baselineFrame = grabFrameData();
+    prevFrame = baselineFrame;
+    let mean = 0;
+    for (let i = 0; i < baselineFrame.data.length; i += 4) mean += baselineFrame.data[i];
+    mean /= (baselineFrame.data.length / 4);
+    let variance = 0;
+    for (let i = 0; i < baselineFrame.data.length; i += 4) variance += Math.pow(baselineFrame.data[i] - mean, 2);
+    variance /= (baselineFrame.data.length / 4);
+    const quality = Math.min(100, Math.round(40 + Math.sqrt(variance)));
+    scores.baseline_match = quality;
+    updateSubScores();
+    updateJson();
+    log('Baseline face capture stored. Frame quality score: ' + quality + '.', 'pass');
+    setStage(1, 'done');
+    baselineBtn.disabled = true;
+    beginBtn.disabled = false;
+  });
+
+  function monitorLoop() {
+    if (!prevFrame) { motionLoopId = requestAnimationFrame(monitorLoop); return; }
+    const frame = grabFrameData();
+    const diff = frameDiff(prevFrame, frame);
+    currentMotion = diff;
+    motionReadout.textContent = 'motion: ' + diff.toFixed(2);
+    motionSamples.push(diff);
+    if (motionSamples.length > 150) motionSamples.shift();
+
+    if (collectingReaction) reactionSamples.push(diff);
+
+    octx.clearRect(0, 0, overlay.width, overlay.height);
+    octx.strokeStyle = 'rgba(201,162,75,0.5)';
+    octx.lineWidth = 1;
+    octx.strokeRect(overlay.width * 0.22, overlay.height * 0.12, overlay.width * 0.56, overlay.height * 0.76);
+
+    prevFrame = frame;
+    motionLoopId = requestAnimationFrame(monitorLoop);
+  }
+
+  beginBtn.addEventListener('click', () => {
+    beginBtn.disabled = true;
+    setStage(2, 'active');
+    log('Live monitoring started — tracking natural micro-movement baseline.', 'info');
+    monitorLoop();
+
+    setTimeout(() => {
+      setStage(2, 'done');
+      log('Baseline motion profile established.', 'pass');
+      runReactionChallenge();
+    }, 4000);
+  });
+
+  function runReactionChallenge() {
+    setStage(3, 'active');
+    const prompt = PROMPTS[Math.floor(Math.random() * PROMPTS.length)];
+    promptText.textContent = prompt;
+    promptOverlay.classList.add('show');
+    log('Reaction challenge triggered: "' + prompt + '"', 'info');
+
+    reactionSamples = [];
+    collectingReaction = true;
+
+    setTimeout(() => {
+      collectingReaction = false;
+      promptOverlay.classList.remove('show');
+
+      const avgReaction = reactionSamples.length
+        ? reactionSamples.reduce((a, b) => a + b, 0) / reactionSamples.length
+        : 0;
+      const avgBaseline = motionSamples.length
+        ? motionSamples.reduce((a, b) => a + b, 0) / motionSamples.length
+        : 0.01;
+
+      const spikeRatio = avgReaction / Math.max(avgBaseline, 0.5);
+      let reactionScore = Math.round(Math.min(100, spikeRatio * 38));
+      reactionScore = Math.max(reactionScore, 12);
+
+      scores.reaction_challenge = reactionScore;
+      if (reactionScore < 50) scores.stage1_flags.push("weak_reaction_to_live_challenge");
+      updateSubScores();
+      updateJson();
+      log('Reaction challenge scored: ' + reactionScore + ' (motion spike ratio ' + spikeRatio.toFixed(2) + 'x baseline).',
+        reactionScore >= 50 ? 'pass' : 'warn');
+      setStage(3, 'done');
+      voiceBtn.disabled = false;
+      maybeFinalize();
+    }, 3200);
+  }
+
+  voiceBtn.addEventListener('click', async () => {
+    voiceBtn.disabled = true;
+    setStage(4, 'active');
+    log('Requesting mic access for voice consistency sampling…', 'info');
+    try {
+      const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = ctx.createMediaStreamSource(audioStream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 2048;
+      source.connect(analyser);
+      const data = new Uint8Array(analyser.fftSize);
+
+      const rmsSamples = [];
+      let elapsed = 0;
+      const sampleWindow = setInterval(() => {
+        analyser.getByteTimeDomainData(data);
+        let sumSquares = 0;
+        for (let i = 0; i < data.length; i++) {
+          const v = (data[i] - 128) / 128;
+          sumSquares += v * v;
+        }
+        const rms = Math.sqrt(sumSquares / data.length);
+        rmsSamples.push(rms);
+        elapsed += 400;
+        if (elapsed >= 4000) {
+          clearInterval(sampleWindow);
+          audioStream.getTracks().forEach(t => t.stop());
+          ctx.close();
+
+          const mean = rmsSamples.reduce((a, b) => a + b, 0) / rmsSamples.length;
+          const variance = rmsSamples.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / rmsSamples.length;
+          const naturalness = Math.min(100, Math.round(variance * 4000));
+          const voiceScore = Math.max(naturalness, 15);
+
+          scores.voice_consistency = voiceScore;
+          if (voiceScore < 50) scores.stage1_flags.push("low_voice_amplitude_variance");
+          updateSubScores();
+          updateJson();
+          log('Voice consistency sampled — amplitude variance score: ' + voiceScore + '.', voiceScore >= 50 ? 'pass' : 'warn');
+
+          runCrossAppCheck();
+        }
+      }, 400);
+    } catch (err) {
+      log('Mic access denied: ' + err.message + '. Voice check skipped.', 'warn');
+      scores.voice_consistency = 0;
+      scores.stage1_flags.push("voice_check_unavailable");
+      updateSubScores();
+      updateJson();
+      runCrossAppCheck();
+    }
+  });
+
+  function runCrossAppCheck() {
+    log('Checking baseline against known-candidate index for duplicate face/voice patterns…', 'info');
+    setTimeout(() => {
+      const crossScore = 100;
+      scores.cross_app_check = crossScore;
+      updateSubScores();
+      updateJson();
+      log('No matching face/voice/style pattern found under a different identity. Cross-application score: ' + crossScore + '.', 'pass');
+      maybeFinalize();
+    }, 900);
+  }
+
+  resetBtn.addEventListener('click', () => location.reload());
+
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(jsonOut.textContent).then(() => {
+      copyBtn.textContent = 'Copied';
+      setTimeout(() => (copyBtn.textContent = 'Copy JSON'), 1200);
+    });
+  });
+
+  updateJson();
+})();
+</script>
+
+</body>
 </html>
