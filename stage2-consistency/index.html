@@ -83,6 +83,10 @@
     font-size: 11px; color: var(--text-dim); margin-bottom: 24px;
     font-family: 'IBM Plex Mono', monospace;
   }
+  .stage-labels { gap: 10px; }
+  .stage-labels span { flex: 1; text-align: center; }
+  .stage-labels span:first-child { text-align: left; }
+  .stage-labels span:last-child { text-align: right; }
   .stage-labels span.current { color: var(--text); }
 
   .field { margin-bottom: 16px; }
@@ -340,7 +344,7 @@
       <div class="heat-head">
         <div>
           <h2>Resume provenance</h2>
-          <div class="hint">Timing only — the page never records which keys were pressed.</div>
+          <div class="hint">Timing only: the page never records which keys were pressed.</div>
         </div>
         <div class="legend">
           <span><i style="background:var(--green)"></i>typed</span>
@@ -393,7 +397,7 @@
 </main>
 
 <footer>
-  AI-polished wording is not penalized — only paste provenance, factual contradictions across resume / cover letter / LinkedIn, and thin or brand-new profiles move the score. Score = 0.30·provenance + 0.50·claims + 0.20·profile; ≥ 60 clears Stage 2. Output is written to <span class="mono">localStorage["trustfunnel.stage2.&lt;candidate_id&gt;"]</span> for the dashboard.
+  AI-polished wording is not penalized. Only paste provenance, factual contradictions across resume / cover letter / LinkedIn, and thin or brand-new profiles move the score. Score = 0.30·provenance + 0.50·claims + 0.20·profile; ≥ 60 clears Stage 2. Output is written to <span class="mono">localStorage["trustfunnel.stage2.&lt;candidate_id&gt;"]</span> for the dashboard.
 </footer>
 
 <script>
@@ -806,7 +810,7 @@ Stanford University — M.S. Computer Science, 2017`,
     $('resumeMeta').innerHTML = 'typed <b>' + st.typedChars + '</b> · pasted <b>' + st.pastedChars + '</b>';
     renderProvenance();
     clearResult();
-    log('Loaded fixture ' + f.id + ' (' + f.name + ') — ' + (key === 'fraud' ? 'resume pasted as one block' : 'resume built incrementally over 23 min'), 'info');
+    log('Loaded fixture ' + f.id + ' (' + f.name + '): ' + (key === 'fraud' ? 'resume pasted as one block' : 'resume built incrementally over 23 min'), 'info');
   }
 
   // ---------- run ----------
@@ -823,7 +827,7 @@ Stanford University — M.S. Computer Science, 2017`,
 
   async function run() {
     const input = readInput();
-    if (!input.resume_text.trim()) { log('Resume is empty — nothing to check.', 'warn'); return; }
+    if (!input.resume_text.trim()) { log('Resume is empty, nothing to check.', 'warn'); return; }
     runBtn.disabled = true;
     clearResult();
     const trace = [], flags = [];
@@ -837,7 +841,7 @@ Stanford University — M.S. Computer Science, 2017`,
       const m = metricsOf(trackers.resume, resumeEl);
       const prov = provenanceScore(m, trace, flags);
       $('s-prov').textContent = prov;
-      log('Provenance score ' + prov + ' — paste ratio ' + pct(m.paste_ratio) + ', rhythm cv ' + (m.rhythm_cv === null ? 'n/a' : m.rhythm_cv.toFixed(2)), prov >= 60 ? 'pass' : 'warn');
+      log('Provenance score ' + prov + ': paste ratio ' + pct(m.paste_ratio) + ', rhythm cv ' + (m.rhythm_cv === null ? 'n/a' : m.rhythm_cv.toFixed(2)), prov >= 60 ? 'pass' : 'warn');
       setStage(1, 'done');
 
       // 2. claims
@@ -861,7 +865,7 @@ Stanford University — M.S. Computer Science, 2017`,
       }
       const claims = claimsScore(llm, trace, flags);
       $('s-claims').textContent = claims;
-      log('Claims score ' + claims + ' — ' + (llm.summary || ''), claims >= 60 ? 'pass' : 'warn');
+      log('Claims score ' + claims + '. ' + (llm.summary || ''), claims >= 60 ? 'pass' : 'warn');
       setStage(2, 'done');
 
       // 3. profile
@@ -892,7 +896,7 @@ Stanford University — M.S. Computer Science, 2017`,
         computed_at: new Date().toISOString()
       });
       renderResult(result);
-      log('Stage 2 complete — Consistency Score: ' + total + ' (' + status + ')', status === 'cleared' ? 'pass' : 'warn');
+      log('Stage 2 complete. Consistency Score: ' + total + ' (' + status + ')', status === 'cleared' ? 'pass' : 'warn');
       setStage(4, 'done');
       try { localStorage.setItem('trustfunnel.stage2.' + input.candidate_id, JSON.stringify(result)); } catch (e) {}
       window.TrustFunnelStage2 = result;
@@ -914,7 +918,7 @@ Stanford University — M.S. Computer Science, 2017`,
     bigStatus.textContent = r.status; bigStatus.className = 'status ' + r.status;
     bigScore.style.color = r.status === 'cleared' ? '' : 'var(--red)';
     flagsEl.innerHTML = '';
-    if (!r.stage2_flags.length) flagsEl.innerHTML = '<div class="flag-empty">No flags — resume, cover letter and LinkedIn agree.</div>';
+    if (!r.stage2_flags.length) flagsEl.innerHTML = '<div class="flag-empty">No flags: resume, cover letter and LinkedIn agree.</div>';
     r.stage2_flags.forEach(f => {
       const d = document.createElement('div');
       d.className = 'flag ' + f.severity;
@@ -1005,7 +1009,7 @@ Stanford University — M.S. Computer Science, 2017`,
     navigator.clipboard.writeText(jsonOut.textContent).then(() => { copyBtn.textContent = 'Copied'; setTimeout(() => copyBtn.textContent = 'Copy JSON', 1200); });
   });
   exportBtn.addEventListener('click', () => {
-    if (!window.TrustFunnelStage2) { log('Nothing to save yet — run the check first.', 'warn'); return; }
+    if (!window.TrustFunnelStage2) { log('Nothing to save yet, run the check first.', 'warn'); return; }
     try {
       localStorage.setItem('trustfunnel.stage2.' + window.TrustFunnelStage2.candidate_id, JSON.stringify(window.TrustFunnelStage2));
       log('Saved to localStorage["trustfunnel.stage2.' + window.TrustFunnelStage2.candidate_id + '"]', 'pass');
